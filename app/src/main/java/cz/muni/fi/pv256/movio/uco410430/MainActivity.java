@@ -11,10 +11,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (BuildConfig.DEBUG) {
-            initStrictMode();
-        }
-
         setContentView(R.layout.activity_main);
     }
 
@@ -38,23 +34,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void initStrictMode() {
-        StrictMode.ThreadPolicy.Builder tpb = new StrictMode.ThreadPolicy.Builder()
-                .detectAll()
-                .penaltyLog();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            tpb.penaltyFlashScreen();
-        }
-        StrictMode.setThreadPolicy(tpb.build());
-
-        StrictMode.VmPolicy.Builder vmpb = new StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
-                .penaltyLog();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            vmpb.detectLeakedClosableObjects();
-        }
-        StrictMode.setVmPolicy(vmpb.build());
     }
 }
