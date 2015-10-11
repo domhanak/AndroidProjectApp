@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="FirstTheme" parent="Theme.AppCompat">
+        <item name="android:background">#FFEB3B</item>
         <item name="colorPrimary">#03A9F4</item>
         <item name="colorPrimaryDark">#0288D1</item>
         <item name="colorAccent">#FFEB3B</item>
