@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="yellow_accent" >#FFEB3B</color>
+    <color name="blue_primary" >#03A9F4</color>
+    <color name="blue_primary_dark" >#0288D1</color>
+    <color name="orange_primary_dark" >#FBC02D</color>
+    <color name="lime_accent" >#CDDC39</color>
+</resources>

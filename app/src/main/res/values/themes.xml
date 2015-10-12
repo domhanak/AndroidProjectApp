@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="FirstTheme" parent="Theme.AppCompat">
-        <item name="android:background">#FFEB3B</item>
-        <item name="colorPrimary">#03A9F4</item>
-        <item name="colorPrimaryDark">#0288D1</item>
-        <item name="colorAccent">#FFEB3B</item>
+        <item name="android:background">@color/yellow_accent</item>
+        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorPrimaryDark">@color/blue_primary_dark</item>
+        <item name="colorAccent">@color/yellow_accent</item>
     </style>
 
     <style name="SecondTheme" parent="FirstTheme" >
-        <item name="colorPrimary">#FFEB3B</item>
-        <item name="colorPrimaryDark">#FBC02D</item>
-        <item name="colorAccent">#CDDC39</item>
+        <item name="colorPrimary">@color/yellow_accent</item>
+        <item name="colorPrimaryDark">@color/orange_primary_dark</item>
+        <item name="colorAccent">@color/lime_accent</item>
     </style>
 </resources>
