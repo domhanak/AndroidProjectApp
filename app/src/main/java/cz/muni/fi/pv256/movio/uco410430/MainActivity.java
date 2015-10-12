@@ -1,7 +1,9 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,6 +12,12 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.Inflater;
+
+import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -17,16 +25,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        GridView gridview = (GridView) findViewById(R.id.gridView);
-      //  gridview.setAdapter(new ArrayAdapter<String>(this));
+        ArrayList<Movie> dummyMovieList = new ArrayList<>(30);
+        for (int i = 0; i < dummyMovieList.size(); ++i) {
+            dummyMovieList.add(i, new Movie());
+            dummyMovieList.get(i).setTitle("Movie " + i);
+            dummyMovieList.get(i).setCoverPath("CoverPath  " + i);
+            dummyMovieList.get(i).setReleaseDate(i);
+        }
 
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Toast.makeText(MainActivity.this, "Hello " + position,
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+        ArrayList<String> stringArrayList = new ArrayList<>(30);
+        for (int i = 0; i < dummyMovieList.size(); ++i) {
+            stringArrayList.add(dummyMovieList.get(i).getTitle());
+        }
+
+        GridView gridview = (GridView) findViewById(R.id.gridView);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.grid_item, stringArrayList);
+
+        gridview.setAdapter(arrayAdapter);
 
     }
 
