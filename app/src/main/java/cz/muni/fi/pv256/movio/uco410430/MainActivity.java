@@ -10,13 +10,18 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.Inflater;
 
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
+import cz.muni.fi.pv256.movio.uco410430.network.MovieAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,24 +30,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayList<Movie> dummyMovieList = new ArrayList<>(30);
-        for (int i = 0; i < dummyMovieList.size(); ++i) {
-            dummyMovieList.add(i, new Movie());
-            dummyMovieList.get(i).setTitle("Movie " + i);
-            dummyMovieList.get(i).setCoverPath("CoverPath  " + i);
-            dummyMovieList.get(i).setReleaseDate(i);
-        }
+        List<Movie> dummyMovieList = generateFakeMovieList(1000);
 
-        ArrayList<String> stringArrayList = new ArrayList<>(30);
-        for (int i = 0; i < dummyMovieList.size(); ++i) {
-            stringArrayList.add(dummyMovieList.get(i).getTitle());
-        }
-
-        GridView gridview = (GridView) findViewById(R.id.gridView);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.grid_item, stringArrayList);
-
+        GridView gridview = (GridView) findViewById(R.id.list);
+        MovieAdapter arrayAdapter = new MovieAdapter(this, dummyMovieList);
+        gridview.setEmptyView(findViewById( R.id.empty_list_view));
         gridview.setAdapter(arrayAdapter);
 
+        TextView headerText = (TextView) findViewById(R.id.gridHeader);
+        headerText.setText("List of available movies");
+
+        //TODO: onClickListener with activity switch to movie detail - need info from next seminar :)))
     }
 
     @Override
@@ -65,5 +63,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private List<Movie> generateFakeMovieList(int count) {
+        if (count < -1) return Collections.EMPTY_LIST;
+
+        List<Movie> movieList = new ArrayList<Movie>(count);
+        for (int i = 0; i < count; ++i) {
+            movieList.add(i, new Movie());
+            movieList.get(i).setTitle("Movie " + i);
+            movieList.get(i).setCoverPath("test/path" + i);
+            movieList.get(i).setReleaseDate(Calendar.DATE);
+        }
+
+        return movieList;
     }
 }

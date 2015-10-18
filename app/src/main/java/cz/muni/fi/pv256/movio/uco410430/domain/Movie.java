@@ -10,6 +10,15 @@ public class Movie {
     private String coverPath;
     private String title;
 
+    public Movie() {
+    }
+
+    public Movie(long releaseDate, String coverPath, String title) {
+        this.releaseDate = releaseDate;
+        this.coverPath = coverPath;
+        this.title = title;
+    }
+
     public long getReleaseDate() {
         return releaseDate;
     }
