@@ -1,6 +1,7 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -41,6 +43,15 @@ public class MainActivity extends AppCompatActivity {
         headerText.setText("List of available movies");
 
         //TODO: onClickListener with activity switch to movie detail - need info from next seminar :)))
+
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = (Intent) new Intent(getApplicationContext(), MovieDetailActivity.class);
+                startActivity(intent);
+
+            }
+        });
     }
 
     @Override
