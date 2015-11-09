@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import com.tonicartos.widget.stickygridheaders.StickyGridHeadersBaseAdapter;
+
 import cz.muni.fi.pv256.movio.uco410430.R;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 
@@ -19,7 +21,7 @@ import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
  *
  * Created by dhanak on 10/18/15.
  */
-public class MovieAdapter extends BaseAdapter {
+public class MovieAdapter extends BaseAdapter implements StickyGridHeadersBaseAdapter {
 
     private Context mContext;
     private List<Movie> mMovies;
@@ -60,10 +62,32 @@ public class MovieAdapter extends BaseAdapter {
         }
 
         ViewHolder holder = (ViewHolder) convertView.getTag();
-        holder.mView.setText(mMovies.get(position).getTitle());
+//        holder.mView.setText(mMovies.get(position).getTitle());
         holder.mImageView.setImageResource(R.mipmap.ic_launcher);
 
         return convertView;
+    }
+
+    @Override
+    public int getCountForHeader(int i) {
+        return mMovies.size();
+    }
+
+    @Override
+    public int getNumHeaders() {
+        return 2;
+    }
+
+    @Override
+    public View getHeaderView(int i, View view, ViewGroup viewGroup) {
+        if (view == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.grid_header, viewGroup, false);
+        }
+
+        TextView headerView = (TextView) view.findViewById(R.id.gridHeader);
+        headerView.setText("Available movies");
+        return view;
     }
 
     private static class ViewHolder {
