@@ -1,57 +1,78 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.zip.Inflater;
 
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.network.MovieAdapter;
 
 public class MainActivity extends AppCompatActivity {
+    private List<Movie> mMovies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.layout_main);
 
-        List<Movie> dummyMovieList = generateFakeMovieList(1000);
+        ArrayList<Movie> dummyList= (ArrayList<Movie>) generateFakeMovieList(30);
+        mMovies = dummyList;
 
-        GridView gridview = (GridView) findViewById(R.id.list);
-        MovieAdapter arrayAdapter = new MovieAdapter(this, dummyMovieList);
-        gridview.setEmptyView(findViewById( R.id.empty_list_view));
-        gridview.setAdapter(arrayAdapter);
 
-        TextView headerText = (TextView) findViewById(R.id.gridHeader);
-        headerText.setText("List of available movies");
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        //TODO: onClickListener with activity switch to movie detail - need info from next seminar :)))
 
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = (Intent) new Intent(getApplicationContext(), MovieDetailActivity.class);
-                startActivity(intent);
+        MovieListFragment fragmentFilmList = MovieListFragment.newInstance(dummyList);
 
+        fragmentTransaction.add(R.id.fragment_list, fragmentFilmList, MovieListFragment.TAG);
+
+        if(getResources().getBoolean(R.bool.isTablet)) {
+            Log.d("MainActivity", "tablet");
+            MovieDetailFragment fragmentFilmDetail = new MovieDetailFragment();
+            fragmentFilmList.setMovieDetailFragment(fragmentFilmDetail);
+
+            fragmentTransaction.add(R.id.fragment_detail, fragmentFilmDetail, MovieDetailFragment.TAG);
+            fragmentTransaction.commit();
+        } else {
+            GridView gridview = (GridView) findViewById(R.id.movie_list_grid);
+            MovieAdapter arrayAdapter = new MovieAdapter(this, dummyList);
+
+            // Distinquish if we will show no-connection message or empty-list message
+            if (ableToConnect()) {
+                gridview.setEmptyView(findViewById(R.id.no_connection_view));
+            } else {
+                gridview.setEmptyView(findViewById(R.id.empty_list_view));
             }
-        });
+            gridview.setAdapter(arrayAdapter);
+
+            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = (Intent) new Intent(getApplicationContext(), MovieDetailActivity.class);
+                    intent.putExtra("title", mMovies.get(position).getTitle());
+                    intent.putExtra("releaseDate", mMovies.get(position).getReleaseDate());
+                    intent.putExtra("coverPath", mMovies.get(position).getCoverPath());
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     @Override
@@ -76,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Fake movie data generator.
+     */
     private List<Movie> generateFakeMovieList(int count) {
         if (count < -1) return Collections.EMPTY_LIST;
 
@@ -88,5 +112,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return movieList;
+    }
+
+    /**
+     * Determines if the device is able to connecto to internet.
+     *
+     * @return true when the connection is possible
+     */
+    private boolean ableToConnect() {
+        ConnectivityManager cm =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

@@ -1,32 +1,20 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_height="match_parent"
+              android:layout_width="match_parent"
+              android:orientation="horizontal">
 
+    <FrameLayout
+        android:id="@+id/film_list_fragment"
+        android:layout_width="0dp"
+        android:layout_weight=".50"
+        android:layout_height="match_parent"
+        />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:background="?colorAccent"
-        android:id="@+id/gridHeader"
-        android:layout_gravity="center_horizontal|top"/>
+    <FrameLayout
+        android:id="@+id/film_detail_fragment"
+        android:layout_width="0dp"
+        android:layout_weight=".50"
+        android:layout_height="match_parent"
+        />
 
-    <GridView
-        android:layout_width="wrap_content"
-        android:layout_height="484dp"
-        android:background="?colorPrimary"
-        android:id="@+id/list"
-        android:numColumns="3"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_gravity="center_horizontal|bottom"/>
-
-    <TextView
-        android:id="@+id/empty_list_view"
-        android:background="?colorAccent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/empty_grid_string"
-        android:visibility="gone"
-        android:layout_gravity="center"/>
-
-</FrameLayout>
+</LinearLayout>
