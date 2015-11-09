@@ -1,0 +1,34 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <com.tonicartos.widget.stickygridheaders.StickyGridHeadersGridView
+            android:layout_below="@+id/textView1"
+            android:id="@+id/movie_list_grid"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="?attr/colorAccent"
+            android:numColumns="3"
+            >
+
+        </com.tonicartos.widget.stickygridheaders.StickyGridHeadersGridView>
+
+    <TextView
+        android:id="@+id/empty_list_view"
+        android:background="?colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/empty_grid_string"
+        android:visibility="gone"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/no_connection_view"
+        android:background="?colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_connection_string"
+        android:visibility="gone"
+        android:layout_gravity="center"/>
+
+</FrameLayout>
