@@ -31,48 +31,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main);
 
-        ArrayList<Movie> dummyList= (ArrayList<Movie>) generateFakeMovieList(30);
-        mMovies = dummyList;
-
-
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-
-        MovieListFragment fragmentFilmList = MovieListFragment.newInstance(dummyList);
-
-        fragmentTransaction.add(R.id.fragment_list, fragmentFilmList, MovieListFragment.TAG);
-
-        if(getResources().getBoolean(R.bool.isTablet)) {
-            Log.d("MainActivity", "tablet");
-            MovieDetailFragment fragmentFilmDetail = new MovieDetailFragment();
-            fragmentFilmList.setMovieDetailFragment(fragmentFilmDetail);
-
-            fragmentTransaction.add(R.id.fragment_detail, fragmentFilmDetail, MovieDetailFragment.TAG);
-            fragmentTransaction.commit();
-        } else {
-            GridView gridview = (GridView) findViewById(R.id.movie_list_grid);
-            MovieAdapter arrayAdapter = new MovieAdapter(this, dummyList);
-
-            // Distinquish if we will show no-connection message or empty-list message
-            if (ableToConnect()) {
-                gridview.setEmptyView(findViewById(R.id.no_connection_view));
-            } else {
-                gridview.setEmptyView(findViewById(R.id.empty_list_view));
-            }
-            gridview.setAdapter(arrayAdapter);
-
-            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent intent = (Intent) new Intent(getApplicationContext(), MovieDetailActivity.class);
-                    intent.putExtra("title", mMovies.get(position).getTitle());
-                    intent.putExtra("releaseDate", mMovies.get(position).getReleaseDate());
-                    intent.putExtra("coverPath", mMovies.get(position).getCoverPath());
-                    startActivity(intent);
-                }
-            });
-        }
+       init();
     }
 
     @Override
@@ -124,5 +83,55 @@ public class MainActivity extends AppCompatActivity {
                 (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    /**
+     * Initializes the application logic.
+     *
+     */
+    private void init() {
+        ArrayList<Movie> dummyList= (ArrayList<Movie>) generateFakeMovieList(50);
+        mMovies = dummyList;
+
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+
+        MovieListFragment fragmentFilmList = MovieListFragment.newInstance(dummyList);
+
+        fragmentTransaction.add(R.id.fragment_list, fragmentFilmList, MovieListFragment.TAG);
+
+        if(getResources().getBoolean(R.bool.isTablet)) {
+            Log.d("MainActivity", "tablet");
+            MovieDetailFragment fragmentFilmDetail = new MovieDetailFragment();
+            fragmentFilmDetail.setMovie(dummyList.get(0));
+            fragmentFilmList.setMovieDetailFragment(fragmentFilmDetail);
+
+            fragmentTransaction.add(R.id.fragment_detail, fragmentFilmDetail, MovieDetailFragment.TAG);
+            fragmentTransaction.commit();
+        } else {
+            GridView gridview = (GridView) findViewById(R.id.movie_list_grid);
+            MovieAdapter arrayAdapter = new MovieAdapter(this, dummyList);
+
+            // Distinquish if we will show no-connection message or empty-list message
+            if (ableToConnect()) {
+                gridview.setEmptyView(findViewById(R.id.no_connection_view));
+            } else {
+                gridview.setEmptyView(findViewById(R.id.empty_list_view));
+            }
+            gridview.setAdapter(arrayAdapter);
+
+            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = (Intent) new Intent(getApplicationContext(), MovieDetailActivity.class);
+                    intent.putExtra("title", mMovies.get(position).getTitle());
+                    intent.putExtra("releaseDate", mMovies.get(position).getReleaseDate());
+                    intent.putExtra("coverPath", mMovies.get(position).getCoverPath());
+                    startActivity(intent);
+                }
+            });
+        }
     }
 }

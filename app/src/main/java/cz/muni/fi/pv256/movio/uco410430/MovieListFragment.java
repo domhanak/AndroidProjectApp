@@ -114,6 +114,7 @@ public class MovieListFragment  extends Fragment implements AdapterView.OnItemCl
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList("movieList", (ArrayList<? extends Parcelable>) mMovieList);
+        outState.putParcelable("movie", mMovieList.get(0));
     }
 
     private boolean ableToConnect() {

@@ -9,9 +9,13 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersBaseAdapter;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import cz.muni.fi.pv256.movio.uco410430.R;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
@@ -28,7 +32,11 @@ public class MovieAdapter extends BaseAdapter implements StickyGridHeadersBaseAd
 
     public MovieAdapter(Context context, List<Movie> movies) {
         mContext = context;
-        mMovies = movies;
+        if (movies != null) {
+            mMovies = movies;
+        } else {
+            mMovies = new ArrayList<>();
+        }
     }
 
     @Override
@@ -53,17 +61,21 @@ public class MovieAdapter extends BaseAdapter implements StickyGridHeadersBaseAd
 
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.grid_item, parent, false);
+
             ViewHolder viewHolder = new ViewHolder();
-            viewHolder.mView = (TextView) convertView.findViewById(R.id.textView);
-            viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.movieImageView);
+            viewHolder.poster = (ImageView) convertView.findViewById(R.id.movieImageView);
             convertView.setTag(viewHolder);
         } else {
             Log.i("", "Recyclation of row " + position);
         }
 
         ViewHolder holder = (ViewHolder) convertView.getTag();
-//        holder.mView.setText(mMovies.get(position).getTitle());
-        holder.mImageView.setImageResource(R.mipmap.ic_launcher);
+        if (mMovies.get(position).getCoverPath() == null) {
+            holder.poster.setImageResource(R.mipmap.ic_launcher);
+        } else  {
+            holder.poster.setImageResource(R.mipmap.ic_launcher);
+            // dl with Picasso
+        }
 
         return convertView;
     }
@@ -87,13 +99,12 @@ public class MovieAdapter extends BaseAdapter implements StickyGridHeadersBaseAd
 
         TextView headerView = (TextView) view.findViewById(R.id.gridHeader);
         headerView.setText("Available movies");
+
         return view;
     }
 
     private static class ViewHolder {
-        TextView mView;
-        ImageView mImageView;
-
+        ImageView poster;
     }
 
 }
