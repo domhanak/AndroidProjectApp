@@ -3,47 +3,86 @@ package cz.muni.fi.pv256.movio.uco410430.domain;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Simple domain class representing Movie.
  *
  * @author Dominik Hanak
  */
 public class Movie implements Parcelable {
-    private long releaseDate;
-    private String coverPath;
-    private String title;
+    private int id;
+
+    @SerializedName("release_date")
+    private String mReleaseDate;
+
+    @SerializedName("poster_path")
+    private String mCoverPath;
+
+    @SerializedName("title")
+    private String mTitle;
+
+    @SerializedName("backdrop_path")
+    private String mBackground;
+
+    @SerializedName("overview")
+    private String mOverview;
 
     public Movie() {
     }
 
-    public Movie(long releaseDate, String coverPath, String title) {
-        this.releaseDate = releaseDate;
-        this.coverPath = coverPath;
-        this.title = title;
+    public Movie(String releaseDate, String coverPath, String title) {
+        this.mReleaseDate = releaseDate;
+        this.mCoverPath = coverPath;
+        this.mTitle = title;
     }
 
-    public long getReleaseDate() {
-        return releaseDate;
+    public String getReleaseDate() {
+        return mReleaseDate;
     }
 
-    public void setReleaseDate(long releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setReleaseDate(String releaseDate) {
+        this.mReleaseDate = releaseDate;
     }
 
     public String getCoverPath() {
-        return coverPath;
+        return mCoverPath;
     }
 
     public void setCoverPath(String coverPath) {
-        this.coverPath = coverPath;
+        this.mCoverPath = coverPath;
     }
 
     public String getTitle() {
-        return title;
+        return mTitle;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.mTitle = title;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getBackground() {
+        return mBackground;
+    }
+
+    public void setBackground(String background) {
+        this.mBackground = background;
+    }
+
+    public String getOverview() {
+        return mOverview;
+    }
+
+    public void setOverview(String overview) {
+        this.mOverview = overview;
     }
 
     @Override
@@ -53,15 +92,19 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.releaseDate);
-        dest.writeString(this.coverPath);
-        dest.writeString(this.title);
+        dest.writeString(this.mReleaseDate);
+        dest.writeString(this.mCoverPath);
+        dest.writeString(this.mTitle);
+        dest.writeString(this.mBackground);
+        dest.writeString(this.mOverview);
     }
 
-    private Movie(Parcel in) {
-        this.releaseDate = in.readLong();
-        this.coverPath = in.readString();
-        this.title = in.readString();
+    protected Movie(Parcel in) {
+        this.mReleaseDate = in.readString();
+        this.mCoverPath = in.readString();
+        this.mTitle = in.readString();
+        this.mBackground = in.readString();
+        this.mOverview = in.readString();
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {

@@ -12,31 +12,40 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bumptech.glide.Glide;
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersBaseAdapter;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import cz.muni.fi.pv256.movio.uco410430.MovieListFragment;
 import cz.muni.fi.pv256.movio.uco410430.R;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
+import cz.muni.fi.pv256.movio.uco410430.utils.Constants;
+
+import static cz.muni.fi.pv256.movio.uco410430.utils.Constants.BASE_URL;
 
 /**
  * Adapter class for Movie view.
  *
  * Created by dhanak on 10/18/15.
  */
-public class MovieAdapter extends BaseAdapter implements StickyGridHeadersBaseAdapter {
+public class MovieAdapter extends BaseAdapter {
 
     private Context mContext;
     private List<Movie> mMovies;
 
-    public MovieAdapter(Context context, List<Movie> movies) {
+    public MovieAdapter(final Context context, final List<Movie> movies) {
         mContext = context;
         if (movies != null) {
             mMovies = movies;
         } else {
             mMovies = new ArrayList<>();
         }
+    }
+
+    public void setMovies(List<Movie> movies) {
+        mMovies = movies;
     }
 
     @Override
@@ -51,7 +60,7 @@ public class MovieAdapter extends BaseAdapter implements StickyGridHeadersBaseAd
 
     @Override
     public long getItemId(int position) {
-        return mMovies.get(position).hashCode();
+        return mMovies.get(position).getId();
     }
 
     @Override
@@ -63,44 +72,17 @@ public class MovieAdapter extends BaseAdapter implements StickyGridHeadersBaseAd
             convertView = inflater.inflate(R.layout.grid_item, parent, false);
 
             ViewHolder viewHolder = new ViewHolder();
-            viewHolder.poster = (ImageView) convertView.findViewById(R.id.movieImageView);
+            viewHolder.poster = (ImageView) convertView.findViewById(R.id.movieCover);
             convertView.setTag(viewHolder);
         } else {
             Log.i("", "Recyclation of row " + position);
         }
 
         ViewHolder holder = (ViewHolder) convertView.getTag();
-        if (mMovies.get(position).getCoverPath() == null) {
-            holder.poster.setImageResource(R.mipmap.ic_launcher);
-        } else  {
-            holder.poster.setImageResource(R.mipmap.ic_launcher);
-            // dl with Picasso
-        }
+        Glide.with(mContext)
+                .load("https://image.tmdb.org/t/p/w396" + mMovies.get(position).getCoverPath()).into(holder.poster);
 
         return convertView;
-    }
-
-    @Override
-    public int getCountForHeader(int i) {
-        return mMovies.size();
-    }
-
-    @Override
-    public int getNumHeaders() {
-        return 2;
-    }
-
-    @Override
-    public View getHeaderView(int i, View view, ViewGroup viewGroup) {
-        if (view == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.grid_header, viewGroup, false);
-        }
-
-        TextView headerView = (TextView) view.findViewById(R.id.gridHeader);
-        headerView.setText("Available movies");
-
-        return view;
     }
 
     private static class ViewHolder {
