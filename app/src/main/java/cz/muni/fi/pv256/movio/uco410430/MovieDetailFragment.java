@@ -20,6 +20,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.widget.Toast;
 
 import cz.muni.fi.pv256.movio.uco410430.database.MovieDatabaseHelper;
+import cz.muni.fi.pv256.movio.uco410430.database.MovieManager;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.utils.Constants;
 
@@ -36,7 +37,7 @@ public class MovieDetailFragment  extends Fragment {
     private Movie mMovie = null;
     private ArrayList<Movie> mMovies;
     private int position;
-    private MovieDatabaseHelper mDatabaseMovies;
+    private MovieManager mMovieManager;
 
     ImageView background;
     ImageView cover;
@@ -46,6 +47,14 @@ public class MovieDetailFragment  extends Fragment {
     TextView director;
     FloatingActionButton fbFav;
 
+    public Movie getMovie() {
+        return mMovie;
+    }
+
+    public void setMovie(Movie movie) {
+        mMovie = movie;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d("MovieDetailFragment", "onCreateView()");
@@ -53,6 +62,7 @@ public class MovieDetailFragment  extends Fragment {
         mMovies = new ArrayList<>();
         mMovies = getArguments().getParcelableArrayList("movies");
         position = getArguments().getInt("position");
+        mMovie = mMovies.get(position);
         setRetainInstance(true);
         return mView;
     }
@@ -82,6 +92,12 @@ public class MovieDetailFragment  extends Fragment {
             overview.setText(mMovies.get(position).getOverview());
             release.setText(mMovies.get(position).getReleaseDate());
 
+
+            if (mMovieManager.contains(mMovie.getId())) {
+                fbFav.setImageResource(R.mipmap.ic_star_full);
+            } else {
+                fbFav.setImageResource(R.mipmap.ic_star_empty);
+            }
         }
     }
 

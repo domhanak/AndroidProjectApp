@@ -41,10 +41,8 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
     private ArrayList<Movie> mMovies;
     private Bundle mBundle;
     private MovieManager mMovieManager;
-    private boolean savedData;
     private MovieListFragment mListFragment;
-    private ArrayList<Movie> mDataDiscover;
-    private ArrayList<Movie> mDataSaved;
+    private MovieDetailFragment mDetailFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,10 +117,6 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         bundle.putParcelableArrayList("movies", movies);
         bundle.putInt("position", -1);
 
-        for (Movie m : movies) {
-            Log.i("MOVIE ID:", String.valueOf(m.getId()));
-        }
-
         if(getResources().getBoolean(R.bool.isTablet)) {
             Log.d("MainActivity", "tablet");
 
@@ -131,9 +125,9 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
             fragmentTransaction.replace(R.id.fragment_list, mListFragment);
             fragmentTransaction.addToBackStack(null);
 
-            MovieDetailFragment movieDetailFragment =  new MovieDetailFragment();
-            movieDetailFragment.setArguments(bundle);
-            fragmentTransaction.add(R.id.fragment_detail, movieDetailFragment, "detail");
+            mDetailFragment =  new MovieDetailFragment();
+            mDetailFragment.setArguments(bundle);
+            fragmentTransaction.add(R.id.fragment_detail, mDetailFragment, "detail");
             fragmentTransaction.commit();
         } else {
             Log.d("MainActivity", "phone");
@@ -213,6 +207,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         Log.i("MainActivity", "Adding to favourites");
 
         Movie movie = mListFragment.getDetailedMovie();
+        Log.d("MainActivity", "Adding movie: " + movie);
         FloatingActionButton floatingActionButton = (FloatingActionButton) view.findViewById(R.id.addToFavButton);
         if (mMovieManager.contains(mListFragment.getDetailedMovie().getId())) {
             mMovieManager.delete(movie);

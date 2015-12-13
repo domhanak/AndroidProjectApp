@@ -1,5 +1,6 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -34,7 +35,6 @@ public class MovieListFragment extends Fragment {
     private GridView mGridView;
     private MovieAdapter mMovieAdapter;
     private Movie mDetailedMovie;
-    private MovieManager mMovieManager;
 
     public MovieListFragment() {
         // required
