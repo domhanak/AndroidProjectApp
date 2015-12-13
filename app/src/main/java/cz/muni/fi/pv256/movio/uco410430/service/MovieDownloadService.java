@@ -57,7 +57,7 @@ public class MovieDownloadService extends IntentService {
         api.getMovies(new Callback<Responses.LoadMovieResponse>() {
                     @Override
                     public void success(final Responses.LoadMovieResponse loadFilmsResponse, final Response response) {
-                        Log.d("Download - movie:",loadFilmsResponse.mMovies.get(0).getTitle());
+                        Log.d("Downloaded movie:",loadFilmsResponse.mMovies.get(0).getTitle());
                         EventBus.getDefault().post(new Responses.LoadMovieResponse(loadFilmsResponse.mMovies));
                     }
 

@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
  */
 public class MovieManager {
 
-    private static final String TAG = ".MovieManager";
+    private static final String TAG = "MovieManager";
 
     private static final String WHERE_ID = MovieEntry._ID + " = ?";
 
@@ -98,12 +99,14 @@ public class MovieManager {
     }
 
     public void set(Movie movie) {
+        Log.d("MovieManager", "Updating movie: " + "movie = [" + movie + "]");
         mContext.getContentResolver()
                 .update(MovieEntry.CONTENT_URI, getContentValuesFromMovie(movie), WHERE_ID,
                         new String[]{String.valueOf(movie.getId())});
     }
 
     public void delete(Movie movie) {
+        Log.d("MovieManager", "Deleting movie: " + "movie = [" + movie + "]");
         mContext.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, WHERE_ID, new String[]{String.valueOf(movie.getId())});
     }
 
@@ -125,7 +128,6 @@ public class MovieManager {
 
     public static ContentValues getContentValuesFromMovie(Movie movie) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(MovieEntry._ID, movie.getId());
         contentValues.put(MovieEntry.MOVIE_NAME, movie.getTitle());
         contentValues.put(MovieEntry.MOVIE_OVERVIEW, movie.getOverview());
         contentValues.put(MovieEntry.MOVIE_COVER, movie.getCoverPath());

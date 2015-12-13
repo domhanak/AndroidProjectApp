@@ -3,11 +3,10 @@
               android:layout_height="match_parent" tools:context=".MainActivity"
               android:weightSum="1">
 
-
     <FrameLayout
         android:id="@+id/fragment_list"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.5"/>
+        android:layout_weight="1"/>
 
 </LinearLayout>

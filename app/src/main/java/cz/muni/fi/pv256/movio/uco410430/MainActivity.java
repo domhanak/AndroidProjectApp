@@ -49,8 +49,8 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         Log.i("MainActivity - onCreate", "Setting content view.");
+        setContentView(R.layout.activity_main);
 
         mMovies = new ArrayList<>();
         mMovieManager = new MovieManager(this);
@@ -65,7 +65,6 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
         mBundle = savedInstanceState;
         SyncAdapter.initializeSyncAdapter(this);
-
     }
 
     @Override
@@ -86,6 +85,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         if (id == R.id.menu_switch) {
             if (item.getTitle().equals("Favorites")){
                 mMovies = (ArrayList<Movie>) mMovieManager.getAll();
+                Log.d("Movies from db size: ", String.valueOf(mMovies.size()));
                 init(mMovies);
                 item.setTitle("Discover");
             }
@@ -118,6 +118,10 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList("movies", movies);
         bundle.putInt("position", -1);
+
+        for (Movie m : movies) {
+            Log.i("MOVIE ID:", String.valueOf(m.getId()));
+        }
 
         if(getResources().getBoolean(R.bool.isTablet)) {
             Log.d("MainActivity", "tablet");
@@ -180,13 +184,10 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.i("MainActivity", "onLoadFinished()");
         if (data != null) {
-            ArrayList<Movie> list = new ArrayList<>();
-            list.add(new Movie("Saved"));
             while (data.moveToNext()) {
-                list.add(MovieManager.getMovieFromCursor(data));
+                Movie movie = MovieManager.getMovieFromCursor(data);
             }
             data.close();
-            mDataSaved = list;
         }
     }
 
@@ -211,7 +212,14 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
     public void addToFavorites(View view) {
         Log.i("MainActivity", "Adding to favourites");
 
+        Movie movie = mListFragment.getDetailedMovie();
         FloatingActionButton floatingActionButton = (FloatingActionButton) view.findViewById(R.id.addToFavButton);
-        floatingActionButton.setImageResource(R.mipmap.ic_star_full);
+        if (mMovieManager.contains(mListFragment.getDetailedMovie().getId())) {
+            mMovieManager.delete(movie);
+            floatingActionButton.setImageResource(R.mipmap.ic_star_empty);
+        } else {
+            mMovieManager.add(movie);
+            floatingActionButton.setImageResource(R.mipmap.ic_star_full);
+        }
     }
 }

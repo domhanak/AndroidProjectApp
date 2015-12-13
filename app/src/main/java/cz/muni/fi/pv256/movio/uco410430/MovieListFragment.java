@@ -105,26 +105,5 @@ public class MovieListFragment extends Fragment {
             empty.setLayoutResource(R.layout.no_connection_view);
             empty.inflate();
         }
-
-    }
-
-    private void updateData(){
-        List<Movie> savedMovies = new ArrayList<>();
-        mMovieManager = new MovieManager(getContext());
-        savedMovies = mMovieManager.getAll();
-        int dbMovieSize = savedMovies.size();
-        int downloadedMoviesSize = mMovies.size();
-        for (int i = 0; i < dbMovieSize; i++){
-            for (int j = 0; j < downloadedMoviesSize; j++){
-                if (savedMovies.get(i).getId() == mMovies.get(j).getId()){
-                    mMovieManager.set(mMovies.get(j));
-                }
-            }
-        }
-    }
-
-    public void updateAdapter(List<Movie> movies) {
-        mMovieAdapter.setMovies(movies);
-        mMovieAdapter.notifyDataSetChanged();
     }
 }
