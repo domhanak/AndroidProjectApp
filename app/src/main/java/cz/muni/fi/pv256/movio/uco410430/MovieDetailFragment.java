@@ -61,8 +61,8 @@ public class MovieDetailFragment  extends Fragment {
         mView = inflater.inflate(R.layout.fragment_detail_layout, container, false);
         mMovies = new ArrayList<>();
         mMovies = getArguments().getParcelableArrayList("movies");
+        mMovieManager = new MovieManager(getContext());
         position = getArguments().getInt("position");
-        mMovie = mMovies.get(position);
         setRetainInstance(true);
         return mView;
     }
@@ -92,8 +92,7 @@ public class MovieDetailFragment  extends Fragment {
             overview.setText(mMovies.get(position).getOverview());
             release.setText(mMovies.get(position).getReleaseDate());
 
-
-            if (mMovieManager.contains(mMovie.getId())) {
+            if (mMovieManager.contains(mMovies.get(position).getId())) {
                 fbFav.setImageResource(R.mipmap.ic_star_full);
             } else {
                 fbFav.setImageResource(R.mipmap.ic_star_empty);
