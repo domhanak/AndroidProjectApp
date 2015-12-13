@@ -16,6 +16,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.muni.fi.pv256.movio.uco410430.database.MovieManager;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.network.MovieAdapter;
 import cz.muni.fi.pv256.movio.uco410430.utils.Connections;
@@ -33,6 +34,7 @@ public class MovieListFragment extends Fragment {
     private GridView mGridView;
     private MovieAdapter mMovieAdapter;
     private Movie mDetailedMovie;
+    private MovieManager mMovieManager;
 
     public MovieListFragment() {
         // required
@@ -104,6 +106,21 @@ public class MovieListFragment extends Fragment {
             empty.inflate();
         }
 
+    }
+
+    private void updateData(){
+        List<Movie> savedMovies = new ArrayList<>();
+        mMovieManager = new MovieManager(getContext());
+        savedMovies = mMovieManager.getAll();
+        int dbMovieSize = savedMovies.size();
+        int downloadedMoviesSize = mMovies.size();
+        for (int i = 0; i < dbMovieSize; i++){
+            for (int j = 0; j < downloadedMoviesSize; j++){
+                if (savedMovies.get(i).getId() == mMovies.get(j).getId()){
+                    mMovieManager.set(mMovies.get(j));
+                }
+            }
+        }
     }
 
     public void updateAdapter(List<Movie> movies) {

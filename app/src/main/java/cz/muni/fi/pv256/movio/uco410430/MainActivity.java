@@ -33,6 +33,7 @@ import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.network.MovieAdapter;
 import cz.muni.fi.pv256.movio.uco410430.network.Responses;
 import cz.muni.fi.pv256.movio.uco410430.service.MovieDownloadService;
+import cz.muni.fi.pv256.movio.uco410430.synchronization.SyncAdapter;
 import de.greenrobot.event.EventBus;
 
 public class MainActivity  extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -62,7 +63,9 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
             downloadData();
         }
 
-        getLoaderManager().initLoader(0, null, this);
+        mBundle = savedInstanceState;
+        SyncAdapter.initializeSyncAdapter(this);
+
     }
 
     @Override
@@ -92,6 +95,10 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
             }
 
             return true;
+        }
+
+        if (id == R.id.menu_refresh) {
+            downloadData();
         }
 
         return super.onOptionsItemSelected(item);

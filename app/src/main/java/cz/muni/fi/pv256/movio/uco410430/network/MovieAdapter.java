@@ -79,7 +79,7 @@ public class MovieAdapter extends BaseAdapter {
         }
 
         ViewHolder holder = (ViewHolder) convertView.getTag();
-        Glide.with(mContext)
+        Picasso.with(mContext)
                 .load("https://image.tmdb.org/t/p/w396" + mMovies.get(position).getCoverPath()).into(holder.poster);
 
         return convertView;
