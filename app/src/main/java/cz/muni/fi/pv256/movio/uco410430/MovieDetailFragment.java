@@ -17,7 +17,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import android.support.design.widget.FloatingActionButton;
+import android.widget.Toast;
 
+import cz.muni.fi.pv256.movio.uco410430.database.MovieDatabaseHelper;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.utils.Constants;
 
@@ -28,11 +30,13 @@ import cz.muni.fi.pv256.movio.uco410430.utils.Constants;
  */
 public class MovieDetailFragment  extends Fragment {
     public static final String TAG = MovieDetailFragment.class.getSimpleName();
+    private static boolean isFavorite = false;
 
     private View mView = null;
     private Movie mMovie = null;
     private ArrayList<Movie> mMovies;
     private int position;
+    private MovieDatabaseHelper mDatabaseMovies;
 
     ImageView background;
     ImageView cover;
@@ -72,8 +76,8 @@ public class MovieDetailFragment  extends Fragment {
     private void populateWithData(){
         Context mContext = getActivity();
         if (position != -1){
-            Glide.with(mContext).load("https://image.tmdb.org/t/p/original" + mMovies.get(position).getBackground()).into(background);
-            Glide.with(mContext).load("https://image.tmdb.org/t/p/w396" + mMovies.get(position).getCoverPath()).into(cover);
+            Picasso.with(mContext).load("https://image.tmdb.org/t/p/original" + mMovies.get(position).getBackground()).into(background);
+            Picasso.with(mContext).load("https://image.tmdb.org/t/p/w396" + mMovies.get(position).getCoverPath()).into(cover);
             name.setText(mMovies.get(position).getTitle());
             overview.setText(mMovies.get(position).getOverview());
             release.setText(mMovies.get(position).getReleaseDate());
@@ -84,5 +88,6 @@ public class MovieDetailFragment  extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putCharSequence("Fragment", "MovieDetailFragment");
     }
 }

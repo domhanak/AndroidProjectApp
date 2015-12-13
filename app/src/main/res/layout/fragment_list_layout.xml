@@ -22,8 +22,7 @@
         android:verticalSpacing="10dp"
         android:horizontalSpacing="10dp"
         android:stretchMode="columnWidth"
-        android:gravity="center"
-        android:layout_marginLeft="16dp"/>
+        android:gravity="center"/>
 
     <ViewStub
         android:id="@+id/empty"

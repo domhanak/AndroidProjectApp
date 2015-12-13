@@ -32,6 +32,7 @@ public class MovieListFragment extends Fragment {
     private ArrayList<Movie> mMovies;
     private GridView mGridView;
     private MovieAdapter mMovieAdapter;
+    private Movie mDetailedMovie;
 
     public MovieListFragment() {
         // required
@@ -58,6 +59,10 @@ public class MovieListFragment extends Fragment {
         insertData();
     }
 
+    public Movie getDetailedMovie() {
+        return mDetailedMovie;
+    }
+
     private void initialize() {
         mGridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -70,6 +75,7 @@ public class MovieListFragment extends Fragment {
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                mDetailedMovie = mMovies.get(position);
                 MovieDetailFragment detailFilmFrag = new MovieDetailFragment();
                 android.support.v4.app.FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 Bundle bundle = new Bundle();
@@ -104,7 +110,4 @@ public class MovieListFragment extends Fragment {
         mMovieAdapter.setMovies(movies);
         mMovieAdapter.notifyDataSetChanged();
     }
-
-
-
 }

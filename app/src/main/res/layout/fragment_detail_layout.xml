@@ -38,10 +38,11 @@
                 android:layout_marginRight="16dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:src="@mipmap/ic_button_plus"
+                android:src="@mipmap/ic_star_empty"
                 android:layout_below="@id/background"
                 android:layout_marginTop="-30dp"
-                android:elevation="6dp"/>
+                android:elevation="6dp"
+                android:onClick="addToFavorites"/>
 
             <View
                 android:layout_width="wrap_content"
