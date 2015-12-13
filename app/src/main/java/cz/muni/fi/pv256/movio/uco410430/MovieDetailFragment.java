@@ -1,9 +1,10 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
-import android.app.Fragment;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,78 +12,77 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import android.support.design.widget.FloatingActionButton;
+
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
+import cz.muni.fi.pv256.movio.uco410430.utils.Constants;
 
 /**
  * Fragment showing detail for one Movie.
  *
  * Created by dhanak on 11/1/15.
  */
-public class MovieDetailFragment  extends Fragment{
+public class MovieDetailFragment  extends Fragment {
     public static final String TAG = MovieDetailFragment.class.getSimpleName();
-
 
     private View mView = null;
     private Movie mMovie = null;
+    private ArrayList<Movie> mMovies;
+    private int position;
 
-    private OnFragmentInteractionListener mListener;
-
-    public void setMovie(Movie movie) {
-        mMovie = movie;
-    }
-
-    public void updateLayout() {
-        Log.d("MovieDetailFragment", "RefreshingLayout");
-
-        // set film info
-        if(mView != null && mMovie != null) {
-            TextView textViewTitle = (TextView) mView.findViewById(R.id.title);
-            textViewTitle.setText(mMovie.getTitle());
-
-            TextView textViewReleaseDate = (TextView) mView.findViewById(R.id.releaseDate);
-            textViewReleaseDate.setText(Long.toString(mMovie.getReleaseDate()));
-
-            ImageView imageViewCover = (ImageView) mView.findViewById(R.id.cover);
-            imageViewCover.setImageResource(R.mipmap.ic_launcher);
-
-            ImageView imageViewBackground = (ImageView) mView.findViewById(R.id.background);
-            imageViewBackground.setImageResource(R.color.blue_primary);
-        }
-        else {
-            Log.d("MovieDetailFragment", "Couldn't refresh.");
-        }
-    }
+    ImageView background;
+    ImageView cover;
+    TextView name;
+    TextView overview;
+    TextView release;
+    TextView director;
+    FloatingActionButton fbFav;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d("MovieDetailFragment", "onCreateView()");
         mView = inflater.inflate(R.layout.fragment_detail_layout, container, false);
-        if (savedInstanceState != null) {
-            mMovie = savedInstanceState.getParcelable("movie");
-        }
-        updateLayout();
+        mMovies = new ArrayList<>();
+        mMovies = getArguments().getParcelableArrayList("movies");
+        position = getArguments().getInt("position");
+        setRetainInstance(true);
         return mView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        background = (ImageView) view.findViewById(R.id.background);
+        cover = (ImageView) view.findViewById(R.id.cover);
+        name = (TextView) view.findViewById(R.id.movieTitle);
+        overview = (TextView) view.findViewById(R.id.overview);
+        release = (TextView) view.findViewById(R.id.releaseDate);
+        director = (TextView) view.findViewById(R.id.movieDirector);
+        fbFav = (FloatingActionButton) view.findViewById(R.id.addToFavButton);
+
+        ImageView cast = (ImageView) view.findViewById(R.id.movieCast);
+        populateWithData();
+    }
+
+    private void populateWithData(){
+        Context mContext = getActivity();
+        if (position != -1){
+            Glide.with(mContext).load("https://image.tmdb.org/t/p/original" + mMovies.get(position).getBackground()).into(background);
+            Glide.with(mContext).load("https://image.tmdb.org/t/p/w396" + mMovies.get(position).getCoverPath()).into(cover);
+            name.setText(mMovies.get(position).getTitle());
+            overview.setText(mMovies.get(position).getOverview());
+            release.setText(mMovies.get(position).getReleaseDate());
+
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d("MovieDetailFragment", "Putting parcable to outState.");
-        outState.putParcelable("movie", mMovie);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            mListener = (OnFragmentInteractionListener) context;
-                    } catch (ClassCastException e) {
-                        throw new ClassCastException(context.toString()
-                + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
     }
 }

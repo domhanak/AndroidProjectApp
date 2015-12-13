@@ -1,13 +1,13 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,22 +16,36 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.network.MovieAdapter;
+import cz.muni.fi.pv256.movio.uco410430.network.Responses;
+import cz.muni.fi.pv256.movio.uco410430.service.MovieDownloadService;
+import de.greenrobot.event.EventBus;
 
-public class MainActivity extends AppCompatActivity {
-    private List<Movie> mMovies;
+public class MainActivity  extends AppCompatActivity  {
+
+    private ArrayList<Movie> mMovies;
+    private Bundle mBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_main);
+        setContentView(R.layout.activity_main);
 
-       init();
+        mMovies = new ArrayList<>();
+
+        if (BuildConfig.logging){
+            Log.i("Logging", "PAID VERSION");
+        }
+
+        EventBus.getDefault().register(this);
+        if (savedInstanceState == null){
+            Log.i("MainActivity - onCreate", "Downloading data");
+            downloadData();
+        }
     }
 
     @Override
@@ -57,81 +71,59 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Fake movie data generator.
-     */
-    private List<Movie> generateFakeMovieList(int count) {
-        if (count < -1) return Collections.EMPTY_LIST;
-
-        List<Movie> movieList = new ArrayList<Movie>(count);
-        for (int i = 0; i < count; ++i) {
-            movieList.add(i, new Movie());
-            movieList.get(i).setTitle("Movie " + i);
-            movieList.get(i).setCoverPath("test/path" + i);
-            movieList.get(i).setReleaseDate(Calendar.DATE);
-        }
-
-        return movieList;
-    }
-
-    /**
-     * Determines if the device is able to connecto to internet.
-     *
-     * @return true when the connection is possible
-     */
-    private boolean ableToConnect() {
-        ConnectivityManager cm =
-                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
-    /**
      * Initializes the application logic.
      *
+     * @param movies
      */
-    private void init() {
-        ArrayList<Movie> dummyList= (ArrayList<Movie>) generateFakeMovieList(50);
-        mMovies = dummyList;
+    private void init(ArrayList<Movie> movies) {
+        FragmentTransaction fragmentTransaction = null;
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
-
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-
-        MovieListFragment fragmentFilmList = MovieListFragment.newInstance(dummyList);
-
-        fragmentTransaction.add(R.id.fragment_list, fragmentFilmList, MovieListFragment.TAG);
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("movies", movies);
+        bundle.putInt("position", -1);
 
         if(getResources().getBoolean(R.bool.isTablet)) {
             Log.d("MainActivity", "tablet");
-            MovieDetailFragment fragmentFilmDetail = new MovieDetailFragment();
-            fragmentFilmDetail.setMovie(dummyList.get(0));
-            fragmentFilmList.setMovieDetailFragment(fragmentFilmDetail);
 
-            fragmentTransaction.add(R.id.fragment_detail, fragmentFilmDetail, MovieDetailFragment.TAG);
+            MovieListFragment movieListFragment = new MovieListFragment();
+            movieListFragment.setArguments(bundle);
+            fragmentTransaction.replace(R.id.fragment_list, movieListFragment);
+            fragmentTransaction.addToBackStack(null);
+
+            MovieDetailFragment movieDetailFragment =  new MovieDetailFragment();
+            movieDetailFragment.setArguments(bundle);
+            fragmentTransaction.add(R.id.fragment_detail, movieDetailFragment, "detail");
             fragmentTransaction.commit();
         } else {
-            GridView gridview = (GridView) findViewById(R.id.movie_list_grid);
-            MovieAdapter arrayAdapter = new MovieAdapter(this, dummyList);
+            Log.d("MainActivity", "phone");
 
-            // Distinquish if we will show no-connection message or empty-list message
-            if (ableToConnect()) {
-                gridview.setEmptyView(findViewById(R.id.no_connection_view));
-            } else {
-                gridview.setEmptyView(findViewById(R.id.empty_list_view));
-            }
-            gridview.setAdapter(arrayAdapter);
-
-            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent intent = (Intent) new Intent(getApplicationContext(), MovieDetailActivity.class);
-                    intent.putExtra("title", mMovies.get(position).getTitle());
-                    intent.putExtra("releaseDate", mMovies.get(position).getReleaseDate());
-                    intent.putExtra("coverPath", mMovies.get(position).getCoverPath());
-                    startActivity(intent);
-                }
-            });
+            MovieListFragment movieListFragment = new MovieListFragment();
+            movieListFragment.setArguments(bundle);
+            fragmentTransaction.replace(R.id.fragment_list, movieListFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         }
     }
+
+    private void downloadData(){
+        Intent downloadIntent = new Intent(this, MovieDownloadService.class);
+        startService(downloadIntent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    public void onEvent(final Responses.LoadMovieResponse response){
+        init((ArrayList<Movie>) response.mMovies);
+    }
+
 }

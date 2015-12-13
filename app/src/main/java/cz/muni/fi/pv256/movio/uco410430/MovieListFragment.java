@@ -1,44 +1,37 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.network.MovieAdapter;
+import cz.muni.fi.pv256.movio.uco410430.utils.Connections;
 
 /**
  * Movie fragment that shows list of available movies.
  *
  * Created by dhanak on 10/25/15.
  */
-public class MovieListFragment  extends Fragment implements AdapterView.OnItemClickListener{
+public class MovieListFragment extends Fragment {
     public static final String TAG = MovieListFragment.class.getSimpleName();
 
-    private MovieDetailFragment mMovieDetailFragment = null;
-    private List<Movie> mMovieList = new ArrayList<>();
-
-    public static MovieListFragment newInstance(ArrayList<Movie> movies) {
-        MovieListFragment fragment = new MovieListFragment();
-                Bundle args = new Bundle();
-                args.putParcelableArrayList("movieList", movies);
-                fragment.setArguments(args);
-                return fragment;
-    }
+    private View mView;
+    private ArrayList<Movie> mMovies;
+    private GridView mGridView;
+    private MovieAdapter mMovieAdapter;
 
     public MovieListFragment() {
         // required
@@ -46,94 +39,72 @@ public class MovieListFragment  extends Fragment implements AdapterView.OnItemCl
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list_layout, container, false);
+        mView = inflater.inflate(R.layout.fragment_list_layout,container,false);
+        mMovies = new ArrayList<Movie>();
+        mMovies = getArguments().getParcelableArrayList("movies");
 
-        GridView gridView = (GridView) view.findViewById(R.id.movie_list_grid);
-
-        if (ableToConnect()) {
-            gridView.setEmptyView(view.findViewById(R.id.empty_list_view));
-        } else {
-            gridView.setEmptyView(view.findViewById(R.id.empty_list_view));
-        }
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("film list", "ItemClick");
-
-                if (mMovieDetailFragment != null) {
-                    Log.d("Movie list", "Setting movie detail.");
-                    mMovieDetailFragment.setMovie(mMovieList.get(position));
-                    mMovieDetailFragment.updateLayout();
-                } else {
-                    Log.d("Movie list", "New detail fragment.");
-                    FragmentManager fragmentManager = getFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-                    MovieDetailFragment fragmentFilmDetail = new MovieDetailFragment();
-                    fragmentFilmDetail.setMovie(mMovieList.get(position));
-
-                    fragmentTransaction
-                            .replace(R.id.fragment_detail, fragmentFilmDetail, MovieDetailFragment.TAG)
-                            .addToBackStack(MovieDetailFragment.TAG)
-                            .setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                            .commit();
-                }
-
-            }
-        });
-
-        gridView.setAdapter(new MovieAdapter(getActivity(), mMovieList));
-        return view;
-    }
-
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            mMovieList = savedInstanceState.getParcelableArrayList("movieList");
-        }
-        if (getArguments() != null) {
-            mMovieList = getArguments().getParcelableArrayList("movieList");
-        }
+        return mView;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mGridView = (GridView) view.findViewById(R.id.movieListGrid);
+        mMovieAdapter = new MovieAdapter(getActivity(), mMovies);
+        mGridView.setAdapter(mMovieAdapter);
+
+        initialize();
+        insertData();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    private void initialize() {
+        mGridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                Toast.makeText(getActivity(), mMovies.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                MovieDetailFragment detailFilmFrag = new MovieDetailFragment();
+                android.support.v4.app.FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                Bundle bundle = new Bundle();
+                bundle.putInt("position", position);
+                bundle.putParcelableArrayList("movies", mMovies);
+                detailFilmFrag.setArguments(bundle);
+                if (getActivity().getResources().getBoolean(R.bool.isTablet)) {
+                    fragmentTransaction.replace(R.id.fragment_detail, detailFilmFrag);
+                } else {
+                    fragmentTransaction.replace(R.id.fragment_list, detailFilmFrag);
+                }
+
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+
+        ViewStub empty = (ViewStub) mView.findViewById(R.id.empty);
+        mGridView.setEmptyView(empty);
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("movieList", (ArrayList<? extends Parcelable>) mMovieList);
-        outState.putParcelable("movie", mMovieList.get(0));
-    }
-
-    private boolean ableToConnect() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
-    public MovieDetailFragment getMovieDetailFragment() {
-        return mMovieDetailFragment;
-    }
-
-    public void setMovieDetailFragment(MovieDetailFragment movieDetailFragment) {
-        mMovieDetailFragment = movieDetailFragment;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    private void insertData(){
+        if (!Connections.isOnline(getActivity())){
+            ViewStub empty = (ViewStub) mView.findViewById(R.id.empty);
+            empty.setLayoutResource(R.layout.no_connection_view);
+            empty.inflate();
+        }
 
     }
+
+    public void updateAdapter(List<Movie> movies) {
+        mMovieAdapter.setMovies(movies);
+        mMovieAdapter.notifyDataSetChanged();
+    }
+
+
+
 }

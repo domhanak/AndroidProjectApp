@@ -4,7 +4,15 @@ import android.app.Application;
 import android.os.Build;
 import android.os.StrictMode;
 
+import cz.muni.fi.pv256.movio.uco410430.network.Api;
+
 public class App extends Application {
+
+    public Api getApi() {
+        return api;
+    }
+
+    private Api api;
 
     @Override
     public void onCreate() {
