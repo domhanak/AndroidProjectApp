@@ -1,11 +1,13 @@
 <resources>
-    <string name="app_name">AndroidProjectApp</string>
+    <string name="app_name">Android Course App</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="empty_grid_string">Grid view is empty</string>
-    <string name="title_activity_detail_msg">movieDetail</string>
+    <string name="empty_grid_string">List is empty. No movies.</string>
+    <string name="title_activity_detail_msg">Detail of movie.</string>
     <string name="no_connection_string">No connection. Please connect check your connectivity and try again.</string>
     <string name="cast">Cast</string>
     <string name="overview">Overview</string>
+    <string name="content_authority">cz.muni.fi.pv256.movio.uco410430</string>
+    <string name="account_type">\@string/content_authority</string>
+    <string name="updated">%1$d of your %2$d favorites were updated.</string>
 </resources>

@@ -39,6 +39,7 @@ import de.greenrobot.event.EventBus;
 public class MainActivity  extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private ArrayList<Movie> mMovies;
+    private ArrayList<Movie> mSavedMovies;
     private Bundle mBundle;
     private MovieManager mMovieManager;
     private MovieListFragment mListFragment;
@@ -51,6 +52,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         setContentView(R.layout.activity_main);
 
         mMovies = new ArrayList<>();
+        mSavedMovies = new ArrayList<>();
         mMovieManager = new MovieManager(this);
 
         if (BuildConfig.logging){
@@ -58,7 +60,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         }
 
         if (savedInstanceState == null) {
-            downloadData();
+     //       downloadData();
         }
 
         mBundle = savedInstanceState;
@@ -113,27 +115,26 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         FragmentTransaction fragmentTransaction = null;
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList("movies", movies);
-        bundle.putInt("position", -1);
+        mBundle.putParcelableArrayList("movies", movies);
+        mBundle.putInt("position", -1);
 
         if(getResources().getBoolean(R.bool.isTablet)) {
             Log.d("MainActivity", "tablet");
 
             mListFragment = new MovieListFragment();
-            mListFragment.setArguments(bundle);
+            mListFragment.setArguments(mBundle);
             fragmentTransaction.replace(R.id.fragment_list, mListFragment);
             fragmentTransaction.addToBackStack(null);
 
             mDetailFragment =  new MovieDetailFragment();
-            mDetailFragment.setArguments(bundle);
+            mDetailFragment.setArguments(mBundle);
             fragmentTransaction.add(R.id.fragment_detail, mDetailFragment, "detail");
             fragmentTransaction.commit();
         } else {
             Log.d("MainActivity", "phone");
 
             mListFragment = new MovieListFragment();
-            mListFragment.setArguments(bundle);
+            mListFragment.setArguments(mBundle);
             fragmentTransaction.replace(R.id.fragment_list, mListFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
@@ -180,6 +181,8 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         if (data != null) {
             while (data.moveToNext()) {
                 Movie movie = MovieManager.getMovieFromCursor(data);
+                mSavedMovies.add(movie);
+                Log.d("onLoadFinished() - ", movie.getTitle());
             }
             data.close();
         }

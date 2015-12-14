@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">Android aplikace</string>
     <string name="action_settings">Nastaveni</string>
-    <string name="cast">Obsazeni</string>
+    <string name="cast">Obsazení</string>
     <string name="overview">Prehled</string>
+    <string name="empty_grid_string">Zozname je prazdny. Ziadne filmy.</string>
+    <string name="title_activity_detail_msg">Detail filmu.</string>
+    <string name="no_connection_string">Žádné připojení. Skontrolujte dostupnosť a skuste znovu.</string>
+    <string name="content_authority">cz.muni.fi.pv256.movio.uco410430</string>
+    <string name="account_type">\@string/content_authority</string>
+    <string name="updated">%1$d z vašich %2$d obľúbených filmov boli aktualizované.</string>
 </resources>
