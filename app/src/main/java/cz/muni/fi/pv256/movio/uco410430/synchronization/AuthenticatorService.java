@@ -9,12 +9,12 @@ import android.os.IBinder;
  */
 public class AuthenticatorService extends Service {
     // Instance field that stores the authenticator object
-    private Authenticator mAuthenticator;
+    private AccountAuthenticator mAuthenticator;
 
     @Override
     public void onCreate() {
         // Create a new authenticator object
-        mAuthenticator = new Authenticator(this);
+        mAuthenticator = new AccountAuthenticator(this);
     }
 
     /*

@@ -8,6 +8,7 @@
     <string name="cast">Cast</string>
     <string name="overview">Overview</string>
     <string name="content_authority">cz.muni.fi.pv256.movio.uco410430</string>
-    <string name="account_type">\@string/content_authority</string>
+    <string name="account_type">cz.muni.fi.pv256.movio.uco410430</string>
     <string name="updated">%1$d of your %2$d favorites were updated.</string>
+    <string name="opening">Openning this week.</string>
 </resources>

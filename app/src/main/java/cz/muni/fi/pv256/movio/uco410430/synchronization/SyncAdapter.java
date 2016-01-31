@@ -21,8 +21,11 @@ import cz.muni.fi.pv256.movio.uco410430.R;
 import cz.muni.fi.pv256.movio.uco410430.database.MovieManager;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.service.MovieDownloadService;
+import de.greenrobot.event.EventBus;
 
 /**
+ * SyncAdapter for peridoc updates.
+ *
  * Created by dhanak on 12/13/15.
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
@@ -134,7 +137,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
         Intent downloadIntent = new Intent(getContext(), MovieDownloadService.class);
-        downloadIntent.putExtra("movie)id", -1);
+        downloadIntent.putExtra("movie_id", -1);
         getContext().startService(downloadIntent);
     }
 }

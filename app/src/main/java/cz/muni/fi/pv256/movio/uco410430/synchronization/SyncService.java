@@ -8,8 +8,8 @@ import android.os.IBinder;
  * Created by dhanak on 12/13/15.
  */
 public class SyncService extends Service {
-    private static SyncAdapter sSyncAdapter = null;
 
+    private static SyncAdapter sSyncAdapter = null;
     private static final Object sSyncAdapterLock = new Object();
 
     /*
