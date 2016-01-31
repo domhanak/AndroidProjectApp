@@ -11,4 +11,5 @@
     <string name="account_type">cz.muni.fi.pv256.movio.uco410430</string>
     <string name="updated">%1$d of your %2$d favorites were updated.</string>
     <string name="opening">Openning this week.</string>
+    <string name="unselected_string">Select a movie. Please!</string>
 </resources>

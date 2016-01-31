@@ -9,4 +9,5 @@
     <string name="content_authority">cz.muni.fi.pv256.movio.uco410430</string>
     <string name="account_type">\@string/content_authority</string>
     <string name="updated">%1$d z vašich %2$d obľúbených filmov boli aktualizované.</string>
+    <string name="unselected_string">Vyberte si film. Prosim!</string>
 </resources>
