@@ -20,7 +20,7 @@ import cz.muni.fi.pv256.movio.uco410430.database.MovieContract.MovieEntry;
  */
 public class MovieProvider extends ContentProvider {
 
-    private static final String TAG = "MovieProvider";
+    private static final String TAG = ".MovieProvider";
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 

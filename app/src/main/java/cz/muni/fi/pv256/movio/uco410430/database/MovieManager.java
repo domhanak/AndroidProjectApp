@@ -20,7 +20,7 @@ import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
  */
 public class MovieManager {
 
-    private static final String TAG = "MovieManager";
+    private static final String TAG = ".MovieManager";
 
     private static final String WHERE_ID = MovieEntry._ID + " = ?";
 
@@ -54,7 +54,7 @@ public class MovieManager {
     }
 
     public Movie get(long id) {
-
+        Log.d(TAG, "Getting movie with id" + id);
         Cursor cursor = mContext.getContentResolver().query(MovieEntry.CONTENT_URI,
                 MOVIE_COLS, WHERE_ID, new String[]{String.valueOf(id)}, null);
 
@@ -89,28 +89,30 @@ public class MovieManager {
         }
         cursor.close();
 
+        Log.d(TAG, "Getting all movies. Size is" + list.size());
         return list;
     }
 
     public long add(Movie movie) {
-        Log.d("MovieManager", "Adding movie: " + "movie = [" + movie + "]");
+        Log.d(TAG, "Adding movie: " + "movie = [" + movie.getTitle() + "]");
         return ContentUris.parseId(mContext.getContentResolver()
                 .insert(MovieEntry.CONTENT_URI, getContentValuesFromMovie(movie)));
     }
 
     public void set(Movie movie) {
-        Log.d("MovieManager", "Updating movie: " + "movie = [" + movie + "]");
+        Log.d(TAG, "Updating movie: " + "movie = [" + movie.getTitle() + "]");
         mContext.getContentResolver()
                 .update(MovieEntry.CONTENT_URI, getContentValuesFromMovie(movie), WHERE_ID,
                         new String[]{String.valueOf(movie.getId())});
     }
 
     public void delete(Movie movie) {
-        Log.d("MovieManager", "Deleting movie: " + "movie = [" + movie + "]");
+        Log.d(TAG, "Deleting movie: " + "movie = [" + movie.getTitle() + "]");
         mContext.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, WHERE_ID, new String[]{String.valueOf(movie.getId())});
     }
 
     public void delete(long id) {
+        Log.d(TAG, "Deleting movie by id" + id);
         mContext.getContentResolver().delete(MovieEntry.CONTENT_URI, WHERE_ID,
                 new String[]{String.valueOf(id)});
     }
