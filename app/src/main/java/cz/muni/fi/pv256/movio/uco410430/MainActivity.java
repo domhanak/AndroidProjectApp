@@ -1,6 +1,5 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
-import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -8,8 +7,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationCompat;
@@ -19,18 +17,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
 
 import cz.muni.fi.pv256.movio.uco410430.database.MovieContract;
 import cz.muni.fi.pv256.movio.uco410430.database.MovieDatabaseHelper;
 import cz.muni.fi.pv256.movio.uco410430.database.MovieManager;
+import cz.muni.fi.pv256.movio.uco410430.database.MovieProvider;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
-import cz.muni.fi.pv256.movio.uco410430.network.MovieAdapter;
 import cz.muni.fi.pv256.movio.uco410430.network.Responses;
 import cz.muni.fi.pv256.movio.uco410430.service.MovieDownloadService;
 import cz.muni.fi.pv256.movio.uco410430.synchronization.SyncAdapter;
@@ -38,32 +34,38 @@ import de.greenrobot.event.EventBus;
 
 public class MainActivity  extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String TAG = ".MainActivity";
+
     private ArrayList<Movie> mMovies;
-    private ArrayList<Movie> mSavedMovies;
+    private boolean isFavourite = false;
+    private boolean areDataSaved;
+
     private Bundle mBundle;
     private MovieManager mMovieManager;
+
     private MovieListFragment mListFragment;
-    private MovieDetailFragment mDetailFragment;
+
+    private List<Movie> mDiscoverData;
+    private ArrayList<Movie> mSavedData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("MainActivity - onCreate", "Setting content view.");
+        Log.i(TAG, "onCreate()");
         setContentView(R.layout.activity_main);
 
+        if (savedInstanceState != null) {
+            mMovies = savedInstanceState.getParcelableArrayList("movies");
+        }
         mMovies = new ArrayList<>();
-        mSavedMovies = new ArrayList<>();
         mMovieManager = new MovieManager(this);
 
         if (BuildConfig.logging){
             Log.i("Logging", "PAID VERSION");
         }
 
-        if (savedInstanceState == null) {
-     //       downloadData();
-        }
-
-        mBundle = savedInstanceState;
+        EventBus.getDefault().register(this);
+        getLoaderManager().initLoader(1, null, this);
         SyncAdapter.initializeSyncAdapter(this);
     }
 
@@ -76,34 +78,39 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        Log.i(TAG, "onOptionsItemSelected");
         if (id == R.id.menu_switch) {
             if (item.getTitle().equals("Favorites")){
-                mMovies = (ArrayList<Movie>) mMovieManager.getAll();
-                Log.d("Movies from db size: ", String.valueOf(mMovies.size()));
+                Log.i("Selected", "Favourites");
+                isFavourite = true;
+                mMovies = mMovieManager.getAll();
+                Log.d("Size of favourites is ", String.valueOf(mMovies.size()));
+                App.getInstance().setSelectedMovie(-1);
                 init(mMovies);
                 item.setTitle("Discover");
             }
             else {
+                Log.i("Selected", "Discover");
+                isFavourite = false;
                 item.setTitle("Favorites");
-                downloadData();
+                if (!areDataSaved) {
+                    downloadData();
+                } else {
+                    setData();
+                }
             }
 
             return true;
         }
 
         if (id == R.id.menu_refresh) {
-            downloadData();
+            SyncAdapter.syncImmediately(this);
         }
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
     /**
@@ -115,59 +122,78 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         FragmentTransaction fragmentTransaction = null;
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
-        mBundle.putParcelableArrayList("movies", movies);
-        mBundle.putInt("position", -1);
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("movies", movies);
+        bundle.putInt("position", App.getInstance().getSelectedMovie());
+
+        mBundle = bundle;
 
         if(getResources().getBoolean(R.bool.isTablet)) {
-            Log.d("MainActivity", "tablet");
+            Log.i(TAG, "tablet");
 
             mListFragment = new MovieListFragment();
-            mListFragment.setArguments(mBundle);
+            mListFragment.setArguments(bundle);
             fragmentTransaction.replace(R.id.fragment_list, mListFragment);
             fragmentTransaction.addToBackStack(null);
 
-            mDetailFragment =  new MovieDetailFragment();
-            mDetailFragment.setArguments(mBundle);
-            fragmentTransaction.add(R.id.fragment_detail, mDetailFragment, "detail");
+            MovieDetailFragment detailFragment = new MovieDetailFragment();
+            detailFragment.setArguments(bundle);
+            fragmentTransaction.add(R.id.fragment_detail, detailFragment, "detail");
             fragmentTransaction.commit();
         } else {
-            Log.d("MainActivity", "phone");
+            Log.i(TAG, "phone");
 
             mListFragment = new MovieListFragment();
-            mListFragment.setArguments(mBundle);
+            mListFragment.setArguments(bundle);
             fragmentTransaction.replace(R.id.fragment_list, mListFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         }
     }
 
-    private void downloadData(){
+    private void downloadData() {
+        Log.i(TAG, "downloadData()");
         Intent downloadIntent = new Intent(this, MovieDownloadService.class);
         startService(downloadIntent);
     }
 
     @Override
     protected void onStart() {
+        Log.i(TAG, "onStart()");
         super.onStart();
-        EventBus.getDefault().register(this);
         if (mBundle == null){
+            Log.i("onStart()", "bundle null, Downloading data...");
             downloadData();
         }
     }
 
+
     @Override
     public void onStop() {
+        Log.i(TAG, "onStop()");
         super.onStop();
         EventBus.getDefault().unregister(this);
     }
 
     public void onEvent(final Responses.LoadMovieResponse response) {
-        init((ArrayList<Movie>) response.mMovies);
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "onEvent() - LoadMovieResponse");
+                if (response.getMovies() == null) {
+                    Log.i("Response null", "Showing notification");
+                    //    showNotification();
+                }
+                Log.i("Response not null", "Initializing");
+                mDiscoverData = response.getMovies();
+                init((ArrayList<Movie>) mDiscoverData);
+            }
+        });
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.i(TAG, "onCreateLoader()");
         return new CursorLoader(this, MovieContract.MovieEntry.CONTENT_URI,
                 MovieManager.MOVIE_COLS,
                 null,
@@ -177,14 +203,17 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i("MainActivity", "onLoadFinished()");
+        Log.i(TAG, "onLoadFinished()");
+        ArrayList<Movie> arrayList = new ArrayList<>();
         if (data != null) {
             while (data.moveToNext()) {
-                Movie movie = MovieManager.getMovieFromCursor(data);
-                mSavedMovies.add(movie);
-                Log.d("onLoadFinished() - ", movie.getTitle());
+                arrayList.add(MovieManager.getMovieFromCursor(data));
             }
             data.close();
+            mSavedData = arrayList;
+            Log.i("mSavedData size is  ", String.valueOf(mSavedData.size()));
+
+            setData();
         }
     }
 
@@ -193,31 +222,40 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         // nop
     }
 
-    public void showNotification() {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(getString(R.string.no_connection_string));
-        mBuilder.setAutoCancel(true);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        // mId allows you to update the notification later on.
-        mNotificationManager.notify(0, mBuilder.build());
-    }
-
     public void addToFavorites(View view) {
-        Log.i("MainActivity", "Adding to favourites");
+        Log.i(TAG, "addToFavourites()");
 
         Movie movie = mListFragment.getDetailedMovie();
-        Log.d("MainActivity", "Adding movie: " + movie);
+        boolean delete = false;
+
+        ArrayList<Movie> tmp = mMovieManager.getAll();
+        for (Movie m : tmp) {
+            if (m.getTitle().equals(movie.getTitle())) {
+                delete = true;
+            }
+        }
         FloatingActionButton floatingActionButton = (FloatingActionButton) view.findViewById(R.id.addToFavButton);
-        if (mMovieManager.contains(mListFragment.getDetailedMovie().getId())) {
+        if (delete) {
+            Log.i("MainActivity", "Deleting movie: " + movie.getTitle());
             mMovieManager.delete(movie);
+            if (isFavourite) getLoaderManager().restartLoader(1, null, MainActivity.this);
             floatingActionButton.setImageResource(R.mipmap.ic_star_empty);
         } else {
+            Log.i("MainActivity", "Adding movie: " + movie.getTitle());
             mMovieManager.add(movie);
+            if (isFavourite) getLoaderManager().restartLoader(1, null, MainActivity.this);
             floatingActionButton.setImageResource(R.mipmap.ic_star_full);
         }
+    }
+
+    public void setData() {
+        Log.i(TAG, "setData()");
+        if (mListFragment != null) {
+            mListFragment.setMovies((ArrayList<Movie>) getCurrentData());
+        }
+    }
+
+    private List<Movie> getCurrentData() {
+        return isFavourite ? mSavedData : mDiscoverData;
     }
 }
