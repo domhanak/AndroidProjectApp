@@ -1,16 +1,12 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
 import android.app.LoaderManager;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -23,9 +19,7 @@ import java.util.List;
 
 
 import cz.muni.fi.pv256.movio.uco410430.database.MovieContract;
-import cz.muni.fi.pv256.movio.uco410430.database.MovieDatabaseHelper;
 import cz.muni.fi.pv256.movio.uco410430.database.MovieManager;
-import cz.muni.fi.pv256.movio.uco410430.database.MovieProvider;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.network.Responses;
 import cz.muni.fi.pv256.movio.uco410430.service.MovieDownloadService;
@@ -38,7 +32,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
     private ArrayList<Movie> mMovies;
     private boolean isFavourite = false;
-    private boolean areDataSaved;
+    private boolean isInitial = true;
 
     private Bundle mBundle;
     private MovieManager mMovieManager;
@@ -59,6 +53,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         }
         mMovies = new ArrayList<>();
         mMovieManager = new MovieManager(this);
+        init(mMovies);
 
         if (BuildConfig.logging){
             Log.i("Logging", "PAID VERSION");
@@ -87,21 +82,15 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
                 isFavourite = true;
                 mMovies = mMovieManager.getAll();
                 Log.d("Size of favourites is ", String.valueOf(mMovies.size()));
-                App.getInstance().setSelectedMovie(-1);
-                init(mMovies);
+                setData();
                 item.setTitle("Discover");
             }
             else {
                 Log.i("Selected", "Discover");
                 isFavourite = false;
                 item.setTitle("Favorites");
-                if (!areDataSaved) {
-                    downloadData();
-                } else {
-                    setData();
-                }
+                setData();
             }
-
             return true;
         }
 
@@ -166,7 +155,6 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
             downloadData();
         }
     }
-
 
     @Override
     public void onStop() {

@@ -13,6 +13,8 @@ public class App extends Application {
     }
 
     private Api api;
+    private static App sInstance = null;
+    public int selectedMovie = -1;
 
     @Override
     public void onCreate() {
@@ -39,5 +41,20 @@ public class App extends Application {
             vmpb.detectLeakedClosableObjects();
         }
         StrictMode.setVmPolicy(vmpb.build());
+    }
+    public static App getInstance(){
+
+        if (sInstance == null){
+            sInstance = new App();
+        }
+        return sInstance;
+    }
+
+    public int getSelectedMovie() {
+        return selectedMovie;
+    }
+
+    public void setSelectedMovie(int filmSelected) {
+        this.selectedMovie = filmSelected;
     }
 }
