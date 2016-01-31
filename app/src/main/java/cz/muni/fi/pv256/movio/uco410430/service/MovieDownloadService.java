@@ -26,6 +26,8 @@ import retrofit.client.Response;
  */
 public class MovieDownloadService extends IntentService {
 
+    public static final int DOWNLOAD_MOVIE = -1;
+
     public MovieDownloadService() {
         super("MovieDownloadService");
     }
@@ -34,6 +36,7 @@ public class MovieDownloadService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.i("MovieDownloadService" , "onHandleIntent");
 
+        int movieId = intent.getIntExtra("movie_id", -1);
         App app = (App) getApplicationContext();
         RestAdapter adapter =
                 new RestAdapter.Builder()
@@ -54,17 +57,32 @@ public class MovieDownloadService extends IntentService {
 
 
         Api api = adapter.create(Api.class);
-        api.getMovies(new Callback<Responses.LoadMovieResponse>() {
-                    @Override
-                    public void success(final Responses.LoadMovieResponse loadFilmsResponse, final Response response) {
-                        Log.d("Downloaded movie:",loadFilmsResponse.mMovies.get(0).getTitle());
-                        EventBus.getDefault().post(new Responses.LoadMovieResponse(loadFilmsResponse.mMovies));
-                    }
+        if ( movieId == DOWNLOAD_MOVIE) {
+            api.getMovies(new Callback<Responses.LoadMovieResponse>() {
+                @Override
+                public void success(final Responses.LoadMovieResponse loadFilmsResponse, final Response response) {
+                    Log.d("Downloaded movie:", loadFilmsResponse.mMovies.get(0).getTitle());
+                    EventBus.getDefault().post(new Responses.LoadMovieResponse(loadFilmsResponse.mMovies));
+                }
 
-                    @Override
-                    public void failure(final RetrofitError error) {
-                        Log.d("DownloadService", error.toString());
-                    }
-        });
+                @Override
+                public void failure(final RetrofitError error) {
+                    Log.d("DownloadService", error.toString());
+                }
+            });
+        } else {
+            api.getCast(movieId, new Callback<Responses.LoadCastResponse>() {
+                @Override
+                public void success(final Responses.LoadCastResponse loadCastResponse, final Response response) {
+                    EventBus.getDefault().post(new Responses.LoadCastResponse(loadCastResponse.cast));
+                }
+
+                @Override
+                public void failure(final RetrofitError error) {
+                    Log.d("DownloadService", error.toString());
+                }
+            });
+
+        }
     }
 }
