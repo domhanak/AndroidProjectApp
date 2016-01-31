@@ -12,10 +12,10 @@ import android.os.Bundle;
  *
  * Created by dhanak on 12/13/15.
  */
-public class Authenticator extends AbstractAccountAuthenticator {
+public class AccountAuthenticator extends AbstractAccountAuthenticator {
     private static final String TAG = ".Authenticator";
 
-    public Authenticator(Context context) {
+    public AccountAuthenticator(Context context) {
         super(context);
     }
 

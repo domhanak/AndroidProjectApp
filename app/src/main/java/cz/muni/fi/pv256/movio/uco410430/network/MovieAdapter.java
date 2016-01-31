@@ -32,6 +32,8 @@ import static cz.muni.fi.pv256.movio.uco410430.utils.Constants.BASE_URL;
  */
 public class MovieAdapter extends BaseAdapter {
 
+    private static final String TAG = ".MovieAdapter";
+
     private Context mContext;
     private List<Movie> mMovies;
 
@@ -45,7 +47,10 @@ public class MovieAdapter extends BaseAdapter {
     }
 
     public void setMovies(List<Movie> movies) {
-        mMovies = movies;
+        Log.i(TAG, "setMovies()");
+        if (movies != null) {
+            mMovies = movies;
+        }
     }
 
     @Override
@@ -65,22 +70,19 @@ public class MovieAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.i(TAG, "getView() for position" + position);
         if (convertView == null) {
-            Log.i("", "Inflation of row " + position);
-
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.grid_item, parent, false);
 
             ViewHolder viewHolder = new ViewHolder();
             viewHolder.poster = (ImageView) convertView.findViewById(R.id.movieCover);
             convertView.setTag(viewHolder);
-        } else {
-            Log.i("", "Recyclation of row " + position);
         }
 
         ViewHolder holder = (ViewHolder) convertView.getTag();
         Picasso.with(mContext)
-                .load("https://image.tmdb.org/t/p/w396" + mMovies.get(position).getCoverPath()).into(holder.poster);
+                .load("https://image.tmdb.org/t/p/w396" + mMovies.get(position).getCoverPath()).into(holder.poster) ;
 
         return convertView;
     }
