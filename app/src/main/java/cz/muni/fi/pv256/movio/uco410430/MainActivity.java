@@ -20,6 +20,7 @@ import java.util.List;
 
 import cz.muni.fi.pv256.movio.uco410430.database.MovieContract;
 import cz.muni.fi.pv256.movio.uco410430.database.MovieManager;
+import cz.muni.fi.pv256.movio.uco410430.domain.Cast;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.network.Responses;
 import cz.muni.fi.pv256.movio.uco410430.service.MovieDownloadService;
@@ -38,8 +39,10 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
     private MovieManager mMovieManager;
 
     private MovieListFragment mListFragment;
+    private MovieDetailFragment mDetailFragment;
 
     private List<Movie> mDiscoverData;
+    private List<Cast> mCast;
     private ArrayList<Movie> mSavedData;
 
     @Override
@@ -121,13 +124,13 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
             Log.i(TAG, "tablet");
 
             mListFragment = new MovieListFragment();
+            mDetailFragment = new MovieDetailFragment();
             mListFragment.setArguments(bundle);
             fragmentTransaction.replace(R.id.fragment_list, mListFragment);
             fragmentTransaction.addToBackStack(null);
 
-            MovieDetailFragment detailFragment = new MovieDetailFragment();
-            detailFragment.setArguments(bundle);
-            fragmentTransaction.add(R.id.fragment_detail, detailFragment, "detail");
+            mDetailFragment.setArguments(bundle);
+            fragmentTransaction.add(R.id.fragment_detail, mDetailFragment, "detail");
             fragmentTransaction.commit();
         } else {
             Log.i(TAG, "phone");
@@ -143,6 +146,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
     private void downloadData() {
         Log.i(TAG, "downloadData()");
         Intent downloadIntent = new Intent(this, MovieDownloadService.class);
+        downloadIntent.putExtra("movie_id", -1);
         startService(downloadIntent);
     }
 
@@ -150,10 +154,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
     protected void onStart() {
         Log.i(TAG, "onStart()");
         super.onStart();
-        if (mBundle == null){
-            Log.i("onStart()", "bundle null, Downloading data...");
-            downloadData();
-        }
+        downloadData();
     }
 
     @Override
@@ -175,6 +176,26 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
                 Log.i("Response not null", "Initializing");
                 mDiscoverData = response.getMovies();
                 init((ArrayList<Movie>) mDiscoverData);
+            }
+        });
+    }
+
+    public void onEvent(final Responses.LoadCastResponse response) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "onEvent() - LoadCastResponse");
+                if (response.getCast() == null) {
+                    Log.i("Response null", "Showing notification");
+                    //    showNotification();
+                    if (response.mCast == null) {
+                        Log.d("lol", "lol");
+                    }
+                }
+                Log.i("Response not null", "Setting cast");
+                if (mListFragment.getDetailFragment() != null) {
+                    mListFragment.getDetailFragment().setCast(response.getCast(), getApplicationContext());
+                }
             }
         });
     }

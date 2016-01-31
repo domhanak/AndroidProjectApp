@@ -1,5 +1,6 @@
 package cz.muni.fi.pv256.movio.uco410430;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.network.MovieAdapter;
+import cz.muni.fi.pv256.movio.uco410430.service.MovieDownloadService;
 import cz.muni.fi.pv256.movio.uco410430.utils.Connections;
 
 /**
@@ -29,6 +31,8 @@ public class MovieListFragment extends Fragment {
     private GridView mGridView;
     private MovieAdapter mMovieAdapter;
     private Movie mDetailedMovie;
+
+    private MovieDetailFragment mDetailFragment;
 
     public MovieListFragment() {
         // required
@@ -51,16 +55,6 @@ public class MovieListFragment extends Fragment {
 
         MovieDetailFragment detailFilmFrag = new MovieDetailFragment();
         android.support.v4.app.FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        Bundle bundle = new Bundle();
-        bundle.putInt("position", -1);
-        bundle.putParcelableArrayList("movies", mMovies);
-        detailFilmFrag.setArguments(bundle);
-        if (getActivity().getResources().getBoolean(R.bool.isTablet)) {
-            fragmentTransaction.replace(R.id.fragment_detail, detailFilmFrag);
-        }
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
         insertData();
         initialize();
     }
@@ -82,16 +76,21 @@ public class MovieListFragment extends Fragment {
             @Override
             public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
                 mDetailedMovie = mMovies.get(position);
-                MovieDetailFragment detailFilmFrag = new MovieDetailFragment();
+
+                Intent downloadIntent = new Intent(getActivity(), MovieDownloadService.class);
+                downloadIntent.putExtra("movie_id", (int) mMovies.get(position).getId());
+                getActivity().startService(downloadIntent);
+
+                mDetailFragment = new MovieDetailFragment();
                 android.support.v4.app.FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 Bundle bundle = new Bundle();
                 bundle.putInt("position", position);
                 bundle.putParcelableArrayList("movies", mMovies);
-                detailFilmFrag.setArguments(bundle);
+                mDetailFragment.setArguments(bundle);
                 if (getActivity().getResources().getBoolean(R.bool.isTablet)) {
-                    fragmentTransaction.replace(R.id.fragment_detail, detailFilmFrag);
+                    fragmentTransaction.replace(R.id.fragment_detail, mDetailFragment);
                 } else {
-                    fragmentTransaction.replace(R.id.fragment_list, detailFilmFrag);
+                    fragmentTransaction.replace(R.id.fragment_list, mDetailFragment);
                 }
 
                 fragmentTransaction.addToBackStack(null);
@@ -116,5 +115,13 @@ public class MovieListFragment extends Fragment {
             mMovies = movies;
             mGridView.setAdapter(new MovieAdapter(getActivity(), mMovies));
         }
+    }
+
+    public MovieDetailFragment getDetailFragment() {
+        return mDetailFragment;
+    }
+
+    public void setDetailFragment(MovieDetailFragment mDetailFragment) {
+        this.mDetailFragment = mDetailFragment;
     }
 }
