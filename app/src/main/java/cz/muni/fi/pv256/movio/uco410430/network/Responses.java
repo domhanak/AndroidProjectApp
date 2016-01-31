@@ -30,20 +30,14 @@ public class Responses {
     }
 
     public static class LoadCastResponse {
-        public int id;
-        public List<Cast> cast;
-
-        public LoadCastResponse(final int id, final List<Cast> cast) {
-            this.id = id;
-            this.cast = cast;
-        }
+        @SerializedName("cast")
+        public List<Cast> mCast;
 
         public LoadCastResponse(final List<Cast> cast) {
-            this.cast = cast;
+            mCast = cast;
         }
-
         public List<Cast> getCast() {
-            return cast;
+            return mCast;
         }
     }
 }

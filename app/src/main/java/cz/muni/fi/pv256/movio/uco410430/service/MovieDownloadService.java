@@ -60,9 +60,9 @@ public class MovieDownloadService extends IntentService {
         if ( movieId == DOWNLOAD_MOVIE) {
             api.getMovies(new Callback<Responses.LoadMovieResponse>() {
                 @Override
-                public void success(final Responses.LoadMovieResponse loadFilmsResponse, final Response response) {
-                    Log.d("Downloaded movie:", loadFilmsResponse.mMovies.get(0).getTitle());
-                    EventBus.getDefault().post(new Responses.LoadMovieResponse(loadFilmsResponse.mMovies));
+                public void success(final Responses.LoadMovieResponse loadMoviesResponse, final Response response) {
+                    Log.d("Downloaded movie:", loadMoviesResponse.mMovies.get(0).getTitle());
+                    EventBus.getDefault().post(new Responses.LoadMovieResponse(loadMoviesResponse.mMovies));
                 }
 
                 @Override
@@ -74,7 +74,7 @@ public class MovieDownloadService extends IntentService {
             api.getCast(movieId, new Callback<Responses.LoadCastResponse>() {
                 @Override
                 public void success(final Responses.LoadCastResponse loadCastResponse, final Response response) {
-                    EventBus.getDefault().post(new Responses.LoadCastResponse(loadCastResponse.cast));
+                    EventBus.getDefault().post(new Responses.LoadCastResponse(loadCastResponse.mCast));
                 }
 
                 @Override
