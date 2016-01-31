@@ -2,27 +2,24 @@ package cz.muni.fi.pv256.movio.uco410430;
 
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import android.support.design.widget.FloatingActionButton;
 import android.widget.Toast;
 
-import cz.muni.fi.pv256.movio.uco410430.database.MovieDatabaseHelper;
 import cz.muni.fi.pv256.movio.uco410430.database.MovieManager;
 import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
-import cz.muni.fi.pv256.movio.uco410430.utils.Constants;
 
 /**
  * Fragment showing detail for one Movie.
@@ -30,22 +27,21 @@ import cz.muni.fi.pv256.movio.uco410430.utils.Constants;
  * Created by dhanak on 11/1/15.
  */
 public class MovieDetailFragment  extends Fragment {
-    public static final String TAG = MovieDetailFragment.class.getSimpleName();
-    private static boolean isFavorite = false;
+    public static final String TAG = ".MovieDetailFragment";
 
     private View mView = null;
     private Movie mMovie = null;
     private ArrayList<Movie> mMovies;
-    private int position;
+    private int position = -1;
     private MovieManager mMovieManager;
 
-    ImageView background;
-    ImageView cover;
-    TextView name;
-    TextView overview;
-    TextView release;
-    TextView director;
-    FloatingActionButton fbFav;
+    private ImageView background;
+    private ImageView cover;
+    private TextView name;
+    private TextView overview;
+    private TextView release;
+    private TextView director;
+    private FloatingActionButton fbFav;
 
     public Movie getMovie() {
         return mMovie;
@@ -59,28 +55,31 @@ public class MovieDetailFragment  extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d("MovieDetailFragment", "onCreateView()");
         mView = inflater.inflate(R.layout.fragment_detail_layout, container, false);
-        mMovies = new ArrayList<>();
         mMovies = getArguments().getParcelableArrayList("movies");
         mMovieManager = new MovieManager(getContext());
         position = getArguments().getInt("position");
-        setRetainInstance(true);
         return mView;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (position != -1) {
+            background = (ImageView) view.findViewById(R.id.background);
+            cover = (ImageView) view.findViewById(R.id.cover);
+            name = (TextView) view.findViewById(R.id.movieTitle);
+            overview = (TextView) view.findViewById(R.id.overview);
+            release = (TextView) view.findViewById(R.id.releaseDate);
+            director = (TextView) view.findViewById(R.id.movieDirector);
+            fbFav = (FloatingActionButton) view.findViewById(R.id.addToFavButton);
 
-        background = (ImageView) view.findViewById(R.id.background);
-        cover = (ImageView) view.findViewById(R.id.cover);
-        name = (TextView) view.findViewById(R.id.movieTitle);
-        overview = (TextView) view.findViewById(R.id.overview);
-        release = (TextView) view.findViewById(R.id.releaseDate);
-        director = (TextView) view.findViewById(R.id.movieDirector);
-        fbFav = (FloatingActionButton) view.findViewById(R.id.addToFavButton);
+            ImageView cast = (ImageView) view.findViewById(R.id.movieCast);
 
-        ImageView cast = (ImageView) view.findViewById(R.id.movieCast);
-        populateWithData();
+            populateWithData();
+        } else {
+            ViewStub viewStub = (ViewStub) view.findViewById(R.id.unselected);
+            viewStub.setVisibility(View.VISIBLE);
+        }
     }
 
     private void populateWithData(){
