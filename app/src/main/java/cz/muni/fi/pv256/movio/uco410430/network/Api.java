@@ -18,5 +18,5 @@ public interface Api {
     void getMovies(Callback<Responses.LoadMovieResponse> response);
 
     @GET("/movie/{id}/credits" + Constants.API_KEY)
-    void getCast(@Path("id") int id, Callback<Responses.LoadMovieResponse> response);
+    void getCast(@Path("id") int id, Callback<Responses.LoadCastResponse> response);
 }
