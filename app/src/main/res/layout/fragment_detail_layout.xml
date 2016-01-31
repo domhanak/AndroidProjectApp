@@ -47,8 +47,8 @@
             <View
                 android:layout_width="wrap_content"
                 android:layout_height="140dp"
-                android:background="?colorPrimary"
-                android:layout_below="@id/background"/>
+                android:layout_below="@id/background"
+                android:background="@color/lime_accent"/>
 
             <TextView
                 android:id="@+id/movieTitle"
@@ -60,24 +60,26 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="20dp"
                 android:textSize="20sp"
-                android:singleLine="false"/>
+                android:singleLine="false"
+                android:background="@color/lime_accent"/>
 
             <TextView
                 android:id="@+id/releaseDate"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/movieTitle"
-                android:layout_below="@id/background"
-                android:layout_marginTop="50dp"/>
+                android:layout_below="@+id/movieTitle"
+                android:layout_alignLeft="@+id/movieTitle"
+                android:layout_alignStart="@+id/movieTitle"
+                android:background="@color/lime_accent"/>
 
             <TextView
                 android:id="@+id/movieDirector"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/movieTitle"
-                android:layout_toRightOf="@id/cover"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="15dp" />
+                android:layout_below="@+id/releaseDate"
+                android:layout_alignLeft="@+id/movieTitle"
+                android:layout_alignStart="@+id/movieTitle"
+                android:background="@color/lime_accent"/>
 
 
             <LinearLayout
@@ -86,13 +88,15 @@
                 android:layout_below="@id/cover"
                 android:layout_marginTop="30dp"
                 android:layout_marginLeft="15dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:id="@+id/linearLayout">
 
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/cast"/>
+                    android:text="@string/cast"
+                    android:textStyle="bold"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -119,7 +123,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/overview"
-                    android:layout_marginTop="30dp"/>
+                    android:layout_marginTop="30dp"
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/overview"
@@ -129,7 +134,16 @@
 
             </LinearLayout>
 
+            <ViewStub
+                android:id="@+id/unselected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                android:layout="@layout/unselected_view"/>
 
         </RelativeLayout>
 
     </ScrollView>
+
