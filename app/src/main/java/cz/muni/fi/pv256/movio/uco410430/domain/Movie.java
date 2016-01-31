@@ -11,6 +11,8 @@ import com.google.gson.annotations.SerializedName;
  * @author Dominik Hanak
  */
 public class Movie implements Parcelable {
+
+    @SerializedName("id")
     private long mId;
 
     @SerializedName("release_date")

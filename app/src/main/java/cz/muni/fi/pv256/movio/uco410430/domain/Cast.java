@@ -8,8 +8,13 @@ import com.google.gson.annotations.SerializedName;
  * Created by dhanak on 12/14/15.
  */
 public class Cast {
+
+    @SerializedName("cast_id")
+    private String mId;
+
     @SerializedName("profile_path")
     private String mImage;
+
     @SerializedName("name")
     private String mName;
 
@@ -18,19 +23,19 @@ public class Cast {
         this.mName = mName;
     }
 
-    public String getmImage() {
+    public String getImage() {
         return mImage;
     }
 
-    public void setmImage(final String mImage) {
+    public void setImage(final String mImage) {
         this.mImage = mImage;
     }
 
-    public String getmName() {
+    public String getName() {
         return mName;
     }
 
-    public void setmName(final String mName) {
+    public void setName(final String mName) {
         this.mName = mName;
     }
 }
