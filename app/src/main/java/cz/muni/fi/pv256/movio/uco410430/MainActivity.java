@@ -226,12 +226,12 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         if (delete) {
             Log.i("MainActivity", "Deleting movie: " + movie.getTitle());
             mMovieManager.delete(movie);
-            if (isFavourite) getLoaderManager().restartLoader(1, null, MainActivity.this);
+            getLoaderManager().restartLoader(1, null, MainActivity.this);
             floatingActionButton.setImageResource(R.mipmap.ic_star_empty);
         } else {
             Log.i("MainActivity", "Adding movie: " + movie.getTitle());
             mMovieManager.add(movie);
-            if (isFavourite) getLoaderManager().restartLoader(1, null, MainActivity.this);
+            getLoaderManager().restartLoader(1, null, MainActivity.this);
             floatingActionButton.setImageResource(R.mipmap.ic_star_full);
         }
     }
