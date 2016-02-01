@@ -8,7 +8,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
 
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -37,8 +37,8 @@ android {
         resConfigs "cs", "en" // only czech and english langs are supported
         resConfigs "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"
 
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
 
         buildConfigField "String", "tmd_api_key", TMD_API_KEY
     }
@@ -47,6 +47,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
 
         debug {
@@ -56,14 +57,12 @@ android {
     productFlavors {
         paid {
             applicationId "cz.muni.fi.pv256.movio.uco410430.paid"
-            buildConfigField "boolean", "logging", "false"
-            buildConfigField "boolean", "free", "false"
+            buildConfigField "boolean", "LOGGING_ENABLED", "true"
         }
 
         free {
             applicationId "cz.muni.fi.pv256.movio.uco410430.free"
-            buildConfigField "boolean", "logging", "true"
-            buildConfigField "boolean", "free", "true"
+            buildConfigField "boolean", "LOGGING_ENABLED", "false"
         }
     }
 }

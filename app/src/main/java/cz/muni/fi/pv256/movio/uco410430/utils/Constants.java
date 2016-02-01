@@ -7,7 +7,7 @@ package cz.muni.fi.pv256.movio.uco410430.utils;
  */
 public class Constants {
     public static final String BASE_URL = "http://api.themoviedb.org/3";
-   	public static final String POPULAR_URL = "/discover/movie?sort_by=popularity.desc";
-   	public static final String HIGHEST_RATE_URL = "/discover/movie/?certification_country=US&certification=R&sort_by=vote_average.desc";
-    public static final String API_KEY = "&api_key=1c7693490352b8abfa9fef1254c03e50";
+   	public static final String POPULAR_URL = "/discover/movie?sort_by=popularity.desc&";
+    public static final String CAST_URL = "/movie/{id}/credits?";
+    public static final String API_KEY = "api_key=1c7693490352b8abfa9fef1254c03e50";
 }
