@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -34,6 +35,7 @@ import cz.muni.fi.pv256.movio.uco410430.domain.Movie;
 import cz.muni.fi.pv256.movio.uco410430.network.CastAdapter;
 import cz.muni.fi.pv256.movio.uco410430.network.Responses;
 import cz.muni.fi.pv256.movio.uco410430.service.MovieDownloadService;
+import cz.muni.fi.pv256.movio.uco410430.synchronization.SyncAdapter;
 import cz.muni.fi.pv256.movio.uco410430.utils.CircleTransformer;
 import de.greenrobot.event.EventBus;
 
@@ -74,7 +76,7 @@ public class MovieDetailFragment  extends Fragment {
         Log.d(TAG, "onCreateView()");
         mView = inflater.inflate(R.layout.fragment_detail_layout, container, false);
         mMovies = getArguments().getParcelableArrayList("movies");
-        mMovieManager = new MovieManager(getContext());
+        mMovieManager = new MovieManager(getActivity());
         mPosition = getArguments().getInt("position");
         mContext = getActivity();
         return mView;
@@ -114,8 +116,10 @@ public class MovieDetailFragment  extends Fragment {
             mRelease.setText(mMovies.get(mPosition).getReleaseDate());
 
             if (mMovieManager.contains(mMovies.get(mPosition).getId())) {
+                Log.i(TAG, "Already in Favs.");
                 mFbFav.setImageResource(R.mipmap.ic_star_full);
             } else {
+                Log.i(TAG, "Not in Favs yet.");
                 mFbFav.setImageResource(R.mipmap.ic_star_empty);
             }
         }
@@ -124,6 +128,7 @@ public class MovieDetailFragment  extends Fragment {
     public void setCast(List<Cast> cast, Context context) {
         Log.d(TAG, "setCast()");
         ListView view = (ListView) mView.findViewById(R.id.cast_list);
+        view.setEnabled(false);
         view.setAdapter(new CastAdapter(context, cast));
     }
 }
