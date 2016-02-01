@@ -236,11 +236,12 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
         Movie movie = mListFragment.getDetailedMovie();
         boolean delete = false;
-
         ArrayList<Movie> tmp = mMovieManager.getAll();
-        for (Movie m : tmp) {
-            if (m.getTitle().equals(movie.getTitle())) {
-                delete = true;
+        if (tmp != null) {
+            for (Movie m : tmp) {
+                if (m.getTitle().equals(movie.getTitle())) {
+                    delete = true;
+                }
             }
         }
         FloatingActionButton floatingActionButton = (FloatingActionButton) view.findViewById(R.id.addToFavButton);
