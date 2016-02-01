@@ -40,17 +40,23 @@ public class MovieManager {
     }
 
     public boolean contains(long id) {
+        Log.i(TAG, "contains() for ID: " + id);
         Cursor cursor = mContext.getContentResolver()
                 .query(MovieEntry.CONTENT_URI, new String[]{MovieEntry._ID}, WHERE_ID,
                         new String[]{String.valueOf(id)}, null);
 
         if (cursor == null) {
-            return false;
+            return  false;
         }
 
-        boolean result = cursor.getCount() == 1;
-        cursor.close();
-        return result;
+        boolean hasObject = false;
+        if (cursor.moveToFirst()) {
+            hasObject = true;
+        }
+        cursor.close();          // CLOSEEEEEEEEEEEEEEEEEE IT!
+
+        return hasObject;
+
     }
 
     public Movie get(long id) {
@@ -119,7 +125,7 @@ public class MovieManager {
 
     public static Movie getMovieFromCursor(Cursor openedCursor) {
         Movie movie = new Movie();
-        movie.setId(openedCursor.getInt(0));
+        movie.setId(openedCursor.getLong(0));
         movie.setTitle(openedCursor.getString(1));
         movie.setOverview(openedCursor.getString(2));
         movie.setCoverPath(openedCursor.getString(3));
