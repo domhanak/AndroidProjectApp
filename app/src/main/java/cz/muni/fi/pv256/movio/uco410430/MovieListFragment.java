@@ -3,6 +3,7 @@ package cz.muni.fi.pv256.movio.uco410430;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +76,7 @@ public class MovieListFragment extends Fragment {
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                Log.i(TAG, "Clicked on movie with ID: " + mMovies.get(position).getId());
                 mDetailedMovie = mMovies.get(position);
 
                 Intent downloadIntent = new Intent(getActivity(), MovieDownloadService.class);

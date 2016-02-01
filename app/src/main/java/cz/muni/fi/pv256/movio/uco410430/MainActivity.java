@@ -33,7 +33,6 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
     private ArrayList<Movie> mMovies;
     private boolean isFavourite = false;
-    private boolean isInitial = true;
 
     private Bundle mBundle;
     private MovieManager mMovieManager;
@@ -53,12 +52,15 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
         if (savedInstanceState != null) {
             mMovies = savedInstanceState.getParcelableArrayList("movies");
+            isFavourite = savedInstanceState.getBoolean("isFavourite");
         }
+
+
         mMovies = new ArrayList<>();
         mMovieManager = new MovieManager(this);
         init(mMovies);
 
-        if (BuildConfig.logging){
+        if (BuildConfig.LOGGING_ENABLED){
             Log.i("Logging", "PAID VERSION");
         }
 
@@ -69,8 +71,15 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.i(TAG, "onCreateOptionsMenu()");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem menuItem = menu.getItem(R.id.menu_switch);
+        if (isFavourite) {
+            menuItem.setTitle("Discover");
+        } else {
+            menuItem.setTitle("Favourites");
+        }
         return true;
     }
 
@@ -91,7 +100,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
             else {
                 Log.i("Selected", "Discover");
                 isFavourite = false;
-                item.setTitle("Favorites");
+                item.setTitle("Favourites");
                 setData();
             }
             return true;
@@ -162,6 +171,14 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         Log.i(TAG, "onStop()");
         super.onStop();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState()");
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isFavourite", isFavourite);
+        outState.putParcelable("detailed_movie", mListFragment.getDetailedMovie());
     }
 
     public void onEvent(final Responses.LoadMovieResponse response) {
@@ -246,12 +263,12 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         }
         FloatingActionButton floatingActionButton = (FloatingActionButton) view.findViewById(R.id.addToFavButton);
         if (delete) {
-            Log.i("MainActivity", "Deleting movie: " + movie.getTitle());
+            Log.i("MainActivity", "Deleting movie: " + movie.getTitle() + "With ID: " + movie.getId());
             mMovieManager.delete(movie);
             getLoaderManager().restartLoader(1, null, MainActivity.this);
             floatingActionButton.setImageResource(R.mipmap.ic_star_empty);
         } else {
-            Log.i("MainActivity", "Adding movie: " + movie.getTitle());
+            Log.i("MainActivity", "Adding movie: " + movie.getTitle() + "With ID: " + movie.getId());
             mMovieManager.add(movie);
             getLoaderManager().restartLoader(1, null, MainActivity.this);
             floatingActionButton.setImageResource(R.mipmap.ic_star_full);
