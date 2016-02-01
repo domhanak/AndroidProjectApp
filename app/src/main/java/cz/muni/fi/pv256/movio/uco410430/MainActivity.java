@@ -41,8 +41,8 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
     private MovieDetailFragment mDetailFragment;
 
     private List<Movie> mDiscoverData;
-    private List<Cast> mCast;
     private ArrayList<Movie> mSavedData;
+    private MenuItem mMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +51,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState != null) {
+            mBundle = savedInstanceState;
             mMovies = savedInstanceState.getParcelableArrayList("movies");
             isFavourite = savedInstanceState.getBoolean("isFavourite");
         }
@@ -58,7 +59,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
         mMovies = new ArrayList<>();
         mMovieManager = new MovieManager(this);
-        init(mMovies);
+        init((ArrayList<Movie>) getCurrentData());
 
         if (BuildConfig.LOGGING_ENABLED){
             Log.i("Logging", "PAID VERSION");
@@ -74,12 +75,6 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
         Log.i(TAG, "onCreateOptionsMenu()");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        MenuItem menuItem = menu.getItem(R.id.menu_switch);
-        if (isFavourite) {
-            menuItem.setTitle("Discover");
-        } else {
-            menuItem.setTitle("Favourites");
-        }
         return true;
     }
 
@@ -89,8 +84,10 @@ public class MainActivity  extends AppCompatActivity implements LoaderManager.Lo
 
         Log.i(TAG, "onOptionsItemSelected");
         if (id == R.id.menu_switch) {
-            if (item.getTitle().equals("Favorites")){
+            if (item.getTitle().equals("Favourites")){
                 Log.i("Selected", "Favourites");
+                Log.i("isFavourite", String.valueOf(isFavourite));
+
                 isFavourite = true;
                 mMovies = mMovieManager.getAll();
                 Log.d("Size of favourites is ", String.valueOf(mMovies.size()));
